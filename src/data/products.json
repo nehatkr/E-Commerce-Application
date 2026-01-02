@@ -1,0 +1,156 @@
+{
+  "products": [
+    {
+      "id": "men-001",
+      "category": "men",
+      "name": "Classic White T-Shirt",
+      "shortDescription": "Premium cotton t-shirt perfect for everyday wear. Soft, breathable, and durable.",
+      "fullDescription": "This Classic White T-Shirt is crafted from 100% premium cotton, offering unmatched comfort and breathability. Designed for everyday wear, it features a regular fit, reinforced stitching, and a smooth finish that feels soft on the skin. Ideal for casual outings, layering, or daily use.",
+      "price": 29.99,
+      "discountPercentage": 10,
+      "discountedPrice": 26.99,
+      "currency": "USD",
+      "stock": 50,
+      "sizes": ["S", "M", "L", "XL"],
+      "colors": ["White"],
+      "fabricDetails": {
+        "material": "100% Cotton",
+        "weight": "180 GSM",
+        "texture": "Soft & breathable",
+        "careInstructions": "Machine wash cold, do not bleach, tumble dry low"
+      },
+      "designDetails": {
+        "fit": "Regular Fit",
+        "neckType": "Round Neck",
+        "sleeveType": "Half Sleeve",
+        "pattern": "Solid",
+        "occasion": "Casual"
+      },
+      "images": {
+        "thumbnail": "/images/men/white-tshirt-thumb.jpg",
+        "gallery": [
+          "/images/men/white-tshirt-1.jpg",
+          "/images/men/white-tshirt-2.jpg",
+          "/images/men/white-tshirt-3.jpg"
+        ]
+      },
+      "rating": 4.6,
+      "reviewsCount": 124,
+      "isFeatured": true,
+      "isNewArrival": false,
+      "addToCartEnabled": true
+    },
+
+    {
+      "id": "women-001",
+      "category": "women",
+      "name": "Floral Summer Dress",
+      "shortDescription": "Lightweight floral dress perfect for summer days.",
+      "fullDescription": "This Floral Summer Dress is made from breathable rayon fabric and designed to keep you cool and stylish. Featuring a flattering silhouette with vibrant floral prints, it’s perfect for casual outings, vacations, and brunch dates.",
+      "price": 49.99,
+      "discountPercentage": 15,
+      "discountedPrice": 42.49,
+      "currency": "USD",
+      "stock": 30,
+      "sizes": ["S", "M", "L"],
+      "colors": ["Pink", "Blue"],
+      "fabricDetails": {
+        "material": "Rayon",
+        "texture": "Lightweight & airy",
+        "careInstructions": "Hand wash recommended"
+      },
+      "designDetails": {
+        "fit": "Slim Fit",
+        "neckType": "V-Neck",
+        "length": "Knee Length",
+        "pattern": "Floral",
+        "occasion": "Casual / Vacation"
+      },
+      "images": {
+        "thumbnail": "/images/women/floral-dress-thumb.jpg",
+        "gallery": [
+          "/images/women/floral-dress-1.jpg",
+          "/images/women/floral-dress-2.jpg"
+        ]
+      },
+      "rating": 4.8,
+      "reviewsCount": 98,
+      "isFeatured": true,
+      "isNewArrival": true,
+      "addToCartEnabled": true
+    },
+
+    {
+      "id": "kids-001",
+      "category": "kids",
+      "name": "Kids Graphic T-Shirt",
+      "shortDescription": "Fun and comfortable graphic t-shirt for kids.",
+      "fullDescription": "Designed with playful graphics and made from soft cotton fabric, this kids graphic t-shirt ensures comfort throughout the day. Durable and easy to wash, it’s perfect for school and playtime.",
+      "price": 19.99,
+      "discountPercentage": 5,
+      "discountedPrice": 18.99,
+      "currency": "USD",
+      "stock": 40,
+      "sizes": ["XS", "S", "M"],
+      "colors": ["Red", "Yellow", "Blue"],
+      "fabricDetails": {
+        "material": "Cotton Blend",
+        "texture": "Soft & skin-friendly",
+        "careInstructions": "Machine wash gentle"
+      },
+      "designDetails": {
+        "fit": "Regular Fit",
+        "pattern": "Graphic Print",
+        "occasion": "Daily Wear"
+      },
+      "images": {
+        "thumbnail": "/images/kids/graphic-tshirt-thumb.jpg",
+        "gallery": [
+          "/images/kids/graphic-tshirt-1.jpg",
+          "/images/kids/graphic-tshirt-2.jpg"
+        ]
+      },
+      "rating": 4.5,
+      "reviewsCount": 65,
+      "isFeatured": false,
+      "isNewArrival": true,
+      "addToCartEnabled": true
+    },
+
+    {
+      "id": "accessories-001",
+      "category": "accessories",
+      "name": "Leather Wallet",
+      "shortDescription": "Premium leather wallet with multiple compartments.",
+      "fullDescription": "This premium leather wallet is crafted from genuine leather and designed for durability and style. It features multiple card slots, a cash compartment, and a slim profile suitable for daily use.",
+      "price": 39.99,
+      "discountPercentage": 0,
+      "discountedPrice": 39.99,
+      "currency": "USD",
+      "stock": 25,
+      "colors": ["Brown", "Black"],
+      "fabricDetails": {
+        "material": "Genuine Leather",
+        "texture": "Smooth finish",
+        "careInstructions": "Wipe with dry cloth"
+      },
+      "designDetails": {
+        "style": "Minimalist",
+        "closureType": "Bi-fold",
+        "occasion": "Everyday / Formal"
+      },
+      "images": {
+        "thumbnail": "/images/accessories/wallet-thumb.jpg",
+        "gallery": [
+          "/images/accessories/wallet-1.jpg",
+          "/images/accessories/wallet-2.jpg"
+        ]
+      },
+      "rating": 4.7,
+      "reviewsCount": 82,
+      "isFeatured": true,
+      "isNewArrival": false,
+      "addToCartEnabled": true
+    }
+  ]
+}
