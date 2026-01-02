@@ -8,6 +8,7 @@ import Inventory from "./pages/Inventory";
 import { useSelector } from "react-redux";
 import Footer from "./pages/Footer";
 import Products from "./pages/Products";
+import ProductDetails from "./pages/ProductDetails";
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -18,7 +19,7 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 overflow-x-hidden">
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
@@ -40,6 +41,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/products/:id" element={<ProductDetails />} />
         </Routes>
         <Footer />
       </div>
