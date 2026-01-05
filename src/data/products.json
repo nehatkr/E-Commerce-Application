@@ -27,10 +27,10 @@
         "occasion": "Casual"
       },
       "images": {
-        "thumbnail": "/images/men/white-tshirt-thumb.jpg",
+        "thumbnail": "https://kingdomofwhite.com/cdn/shop/files/pdp-Thrive_Survive-1.jpg?crop=center&height=1080&v=1753949077&width=720",
         "gallery": [
-          "/images/men/white-tshirt-1.jpg",
-          "/images/men/white-tshirt-2.jpg",
+          "https://ih1.redbubble.net/image.4962280281.7759/ssrco,essential_tee,mens_01,fafafa:ca443f4786,front,product_square,x600.u1.jpg",
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5a4a0_lv_1C3UdgDU8IAUZYKbOBp7crQ4xQ&s",
           "/images/men/white-tshirt-3.jpg"
         ]
       },
@@ -67,7 +67,7 @@
         "occasion": "Casual / Vacation"
       },
       "images": {
-        "thumbnail": "/images/women/floral-dress-thumb.jpg",
+        "thumbnail": "https://m.media-amazon.com/images/I/815DY3+-WvL._AC_UY1100_.jpg",
         "gallery": [
           "/images/women/floral-dress-1.jpg",
           "/images/women/floral-dress-2.jpg"
@@ -104,7 +104,7 @@
         "occasion": "Daily Wear"
       },
       "images": {
-        "thumbnail": "/images/kids/graphic-tshirt-thumb.jpg",
+        "thumbnail": "https://cdn09.nnnow.com/web-images/large/styles/ABOZ6NIDM3J/1752572804151/1.jpg",
         "gallery": [
           "/images/kids/graphic-tshirt-1.jpg",
           "/images/kids/graphic-tshirt-2.jpg"
@@ -140,7 +140,7 @@
         "occasion": "Everyday / Formal"
       },
       "images": {
-        "thumbnail": "/images/accessories/wallet-thumb.jpg",
+        "thumbnail": "https://urbanforest.co.in/cdn/shop/files/A7402041.jpg?crop=center&height=2048&v=1733571068&width=2048",
         "gallery": [
           "/images/accessories/wallet-1.jpg",
           "/images/accessories/wallet-2.jpg"
