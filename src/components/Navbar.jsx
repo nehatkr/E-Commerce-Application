@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, User, Menu, X, Package } from "lucide-react";
+import { ShoppingCart, User, Menu, X, Package  } from "lucide-react";
 import { logout } from "../redux/authSlice";
 import CartModal from "../pages/CartModal";
 
@@ -37,7 +37,6 @@ const Navbar = () => {
       <nav className="bg-white shadow-md fixed top-0 w-full z-40">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between h-16 items-center">
-
             {/* LEFT */}
             <div className="flex items-center gap-4">
               <button onClick={openMenu}>
@@ -74,9 +73,7 @@ const Navbar = () => {
                   {/* USER */}
                   <div className="flex items-center gap-2">
                     <User size={22} />
-                    <span className="hidden md:block">
-                      {user?.firstName}
-                    </span>
+                    <span className="hidden md:block">{user?.firstName}</span>
                   </div>
                 </>
               ) : (
@@ -120,11 +117,18 @@ const Navbar = () => {
               {isLoggedIn ? (
                 <>
                   <li>
+                    <Link to="/inventory" onClick={() => setIsMenuOpen(false)}>
+                      Add Item
+                    </Link>
+                  </li>
+
+                  {/* ✅ EDIT PRODUCTS */}
+                  <li className="text-gray-800 hover:text-gray-600 font-bold flex items-center gap-2">
                     <Link
-                      to="/inventory"
+                      to="/admin/edit-products"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Add Item
+                      Edit Products
                     </Link>
                   </li>
 
@@ -157,10 +161,7 @@ const Navbar = () => {
       )}
 
       {/* CART MODAL */}
-      <CartModal
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-      />
+      <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
   );
 };
