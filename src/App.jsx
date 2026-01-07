@@ -5,27 +5,33 @@ import { useSelector } from "react-redux";
 import Navbar from "./components/Navbar";
 import Footer from "./pages/Footer";
 
+// User Pages
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Inventory from "./pages/Inventory";
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
-import EditProducts from "./pages/EditProducts"; // ✅ NEW
 
-// 🔐 Protected Route Wrapper
+// Admin Pages
+import AdminSignup from "./AdminDashboard/AdminSignup";
+import EditProducts from "./pages/EditProducts"; // Admin edit page
+
+// 🔐 Protected Route (User login check)
 const ProtectedRoute = ({ children }) => {
   const { isLoggedIn } = useSelector((state) => state.auth);
   return isLoggedIn ? children : <Navigate to="/login" />;
 };
 
 /*
- 🔮 FUTURE:
- You can later create:
+ 🔮 FUTURE ADMIN ROLE CHECK (backend ready)
+ 
  const AdminRoute = ({ children }) => {
-   const { user } = useSelector(state => state.auth)
-   return user?.role === "admin" ? children : <Navigate to="/" />
- }
+   const { user } = useSelector((state) => state.auth);
+   return user?.role === "admin"
+     ? children
+     : <Navigate to="/" />;
+ };
 */
 
 function App() {
@@ -34,14 +40,18 @@ function App() {
       <div className="min-h-screen bg-gray-50 overflow-x-hidden flex flex-col">
         <Navbar />
 
+        {/* MAIN CONTENT */}
         <main className="grow">
           <Routes>
-            {/* PUBLIC ROUTES */}
+            {/* ================= PUBLIC ROUTES ================= */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
 
-            {/* PROTECTED ROUTES */}
+            {/* ADMIN / VENDOR SIGNUP (PUBLIC) */}
+            <Route path="/admin/signup" element={<AdminSignup />} />
+
+            {/* ================= PROTECTED USER ROUTES ================= */}
             <Route
               path="/inventory"
               element={
@@ -69,7 +79,7 @@ function App() {
               }
             />
 
-            {/* ✅ ADMIN / EDIT PRODUCTS */}
+            {/* ================= ADMIN ROUTES ================= */}
             <Route
               path="/admin/edit-products"
               element={
@@ -79,7 +89,7 @@ function App() {
               }
             />
 
-            {/* FALLBACK */}
+            {/* ================= FALLBACK ================= */}
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </main>
