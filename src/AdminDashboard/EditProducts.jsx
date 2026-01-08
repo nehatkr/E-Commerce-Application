@@ -191,21 +191,6 @@ const EditProducts = () => {
                   )}
                 </td>
 
-                {/* COLORS */}
-                <td className="p-4">
-                  {editingId === product.id ? (
-                    <input
-                      value={form.colors}
-                      onChange={(e) =>
-                        setForm({ ...form, colors: e.target.value })
-                      }
-                      className="border px-2 py-1 w-40"
-                    />
-                  ) : (
-                    product.colors?.join(", ")
-                  )}
-                </td>
-
                 {/* CART ENABLE */}
                 <td className="p-4 text-center">
                   {editingId === product.id ? (

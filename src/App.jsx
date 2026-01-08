@@ -9,13 +9,13 @@ import Footer from "./pages/Footer";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Inventory from "./pages/Inventory";
+import Inventory from "./AdminDashboard/Inventory";
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
 
 // Admin Pages
 import AdminSignup from "./AdminDashboard/AdminSignup";
-import EditProducts from "./pages/EditProducts"; // Admin edit page
+import EditProducts from "./AdminDashboard/EditProducts"; // Admin edit page
 
 // 🔐 Protected Route (User login check)
 const ProtectedRoute = ({ children }) => {
