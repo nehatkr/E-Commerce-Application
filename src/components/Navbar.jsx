@@ -41,9 +41,11 @@ const Navbar = () => {
           <div className="flex justify-between h-16 items-center">
             {/* LEFT */}
             <div className="flex items-center gap-4">
-              <button onClick={openMenu}>
-                <Menu size={24} />
-              </button>
+              {isLoggedIn && (
+                <button onClick={openMenu}>
+                  <Menu size={24} />
+                </button>
+              )}
 
               <Link to="/" className="text-2xl font-bold">
                 StyleHub
@@ -145,7 +147,7 @@ const Navbar = () => {
                         </Link>
                       </li>
 
-                      <li className="text-gray-800 hover:text-gray-600 font-bold flex items-center gap-2" >
+                      <li className="text-gray-800 hover:text-gray-600 font-bold flex items-center gap-2">
                         <Link
                           to="/admin/edit-products"
                           onClick={() => setIsMenuOpen(false)}
