@@ -34,6 +34,11 @@ const ProtectedRoute = ({ children }) => {
  };
 */
 
+const VendorRoute = ({ children }) => {
+  const { user } = useSelector((state) => state.auth);
+  return user?.role === "vendor" ? children : <Navigate to="/" />;
+};
+
 function App() {
   return (
     <BrowserRouter>
@@ -50,6 +55,23 @@ function App() {
 
             {/* ADMIN / VENDOR SIGNUP (PUBLIC) */}
             <Route path="/admin/signup" element={<AdminSignup />} />
+            <Route
+              path="/inventory"
+              element={
+                <VendorRoute>
+                  <Inventory />
+                </VendorRoute>
+              }
+            />
+
+            <Route
+              path="/admin/edit-products"
+              element={
+                <VendorRoute>
+                  <EditProducts />
+                </VendorRoute>
+              }
+            />
 
             {/* ================= PROTECTED USER ROUTES ================= */}
             <Route

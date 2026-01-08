@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const AdminSignup = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ const AdminSignup = () => {
     permanentAddress: "",
     shopAddress: "",
     pinCode: "",
+    phoneNo:"",
     gstNumber: "",
     password: "",
     confirmPassword: "",
@@ -158,6 +160,15 @@ const AdminSignup = () => {
               className="input"
               required
             />
+             <input
+              name="phoneNo."
+              placeholder="Mobile"
+              value={formData.phoneNo}
+              onChange={handleChange}
+              className="number"
+              max={12}
+              required
+            />
           </div>
         </div>
 
@@ -189,10 +200,15 @@ const AdminSignup = () => {
         {/* SUBMIT */}
         <button
           type="submit"
-          className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition"
+          className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition transform transition-transform duration-75 active:scale-95"
         >
           Register as Vendor
         </button>
+         <div className="text-center mt-2">
+            <Link to="/login" className="text-sm text-blue-600">
+              Already have an account? Sign In
+            </Link>
+          </div>
       </form>
     </div>
   );

@@ -1,32 +1,68 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { login } from '../redux/authSlice';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { login } from "../redux/authSlice";
+import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("user"); // ✅ DEFAULT ROLE
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (email && password) {
-      // Dummy validation success
-      dispatch(login({ firstName: '', email }));
-      navigate('/');
+
+    if (!email || !password) return;
+
+    // 🔮 Dummy login (backend-ready)
+    dispatch(
+      login({
+        firstName: role === "vendor" ? "Vendor" : "User",
+        email,
+        role, // ✅ IMPORTANT
+      })
+    );
+
+    // Role-based redirect
+    if (role === "vendor") {
+      navigate("/inventory");
+    } else {
+      navigate("/");
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-300 flex items-center justify-center mt-10">
-      <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg ">
-        <h2 className="text-3xl font-bold text-center mb-6  text-gray-900 ">Welcome Back</h2>
+      <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
+        <h2 className="text-3xl font-bold text-center mb-6 text-gray-900">
+          Welcome Back
+        </h2>
+
         <form onSubmit={handleLogin} className="space-y-6">
+          {/* ROLE SELECTION */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
-            <input 
-              type="email" 
+            <label className="block text-sm font-medium text-gray-700">
+              Login As
+            </label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-900 focus:border-gray-900"
+            >
+              <option value="user">User</option>
+              <option value="vendor">Vendor</option>
+            </select>
+          </div>
+
+          {/* EMAIL */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <input
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-900 focus:border-gray-900"
@@ -34,10 +70,14 @@ const Login = () => {
               required
             />
           </div>
+
+          {/* PASSWORD */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
-            <input 
-              type="password" 
+            <label className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <input
+              type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-900 focus:border-gray-900"
@@ -46,12 +86,31 @@ const Login = () => {
               minLength={6}
             />
           </div>
-          <button type="submit" className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-gray-800">
+
+          {/* SUBMIT */}
+          <button
+            type="submit"
+            className="w-full py-3 rounded-md text-white bg-gray-900 hover:bg-gray-800"
+          >
             Sign In
           </button>
         </form>
-        <div className="text-center mt-4">
-            <Link to="/signup" className="text-sm text-blue-600">Don't have an account? Sign Up</Link>
+
+        {/* SIGNUP LINKS */}
+        <div className="text-center mt-6 space-y-2">
+          <p className="text-sm text-gray-600">
+            New User?{" "}
+            <Link to="/signup" className="text-blue-600 font-medium">
+              User Sign Up
+            </Link>
+          </p>
+
+          <p className="text-sm text-gray-600">
+            Want to sell?{" "}
+            <Link to="/admin/signup" className="text-blue-600 font-medium">
+              Vendor Sign Up
+            </Link>
+          </p>
         </div>
       </div>
     </div>

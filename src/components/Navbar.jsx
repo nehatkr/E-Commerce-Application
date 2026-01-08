@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, User, Menu, X, Package  } from "lucide-react";
+import { ShoppingCart, User, Menu, X, Package } from "lucide-react";
 import { logout } from "../redux/authSlice";
 import CartModal from "../pages/CartModal";
 
 const Navbar = () => {
   const { isLoggedIn, user } = useSelector((state) => state.auth);
   const cartItems = useSelector((state) => state.cart.items);
+
+  const role = user?.role;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -52,9 +54,11 @@ const Navbar = () => {
             <div className="flex items-center gap-6">
               {isLoggedIn ? (
                 <>
-                  <Link to="/inventory">
-                    <Package size={24} />
-                  </Link>
+                  {role === "vendor" && (
+                    <Link to="/inventory">
+                      <Package size={24} />
+                    </Link>
+                  )}
 
                   {/* CART ICON */}
                   <button
@@ -116,21 +120,41 @@ const Navbar = () => {
 
               {isLoggedIn ? (
                 <>
-                  <li>
-                    <Link to="/inventory" onClick={() => setIsMenuOpen(false)}>
-                      Add Item
-                    </Link>
-                  </li>
+                  {/* USER MENU */}
+                  {user?.role === "user" && (
+                    <>
+                      <li>
+                        <Link
+                          to="/products"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          Shop
+                        </Link>
+                      </li>
+                    </>
+                  )}
+                  {/* VENDOR MENU */}
+                  {user?.role === "vendor" && (
+                    <>
+                      <li>
+                        <Link
+                          to="/inventory"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          Inventory Management
+                        </Link>
+                      </li>
 
-                  {/* ✅ EDIT PRODUCTS */}
-                  <li className="text-gray-800 hover:text-gray-600 font-bold flex items-center gap-2">
-                    <Link
-                      to="/admin/edit-products"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Edit Products
-                    </Link>
-                  </li>
+                      <li className="text-gray-800 hover:text-gray-600 font-bold flex items-center gap-2" >
+                        <Link
+                          to="/admin/edit-products"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          Edit Products
+                        </Link>
+                      </li>
+                    </>
+                  )}
 
                   <li>
                     <button
@@ -151,6 +175,14 @@ const Navbar = () => {
                   <li>
                     <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
                       Sign Up
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/admin/signup"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Vendor Sign Up
                     </Link>
                   </li>
                 </>

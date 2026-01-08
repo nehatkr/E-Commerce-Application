@@ -4,8 +4,9 @@ import { ArrowRight, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
-  const { isLoggedIn } = useSelector((state) => state.auth);
+  const { isLoggedIn, user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
+  const role = user?.role;
 
   const handleShopNow = () => {
     if (isLoggedIn) {
@@ -15,10 +16,12 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-
       <div
         className="relative h-150 bg-cover bg-center flex items-center"
-        style={{ backgroundImage: 'url(https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg)', }}
+        style={{
+          backgroundImage:
+            "url(https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg)",
+        }}
       >
         <div className="absolute inset-0 bg-opacity-40" />
 
@@ -30,13 +33,51 @@ const Home = () => {
             Explore our curated collection of premium fashion for everyone
           </p>
 
-          <button
+          {/* <button
             onClick={handleShopNow}
             className="bg-white text-black px-8 py-4 rounded-lg font-semibold hover:bg-gray-200 transition inline-flex items-center gap-2"
           >
             Shop Now
             <ArrowRight />
-          </button>
+          </button> */}
+
+          <div className="flex gap-4 flex-wrap">
+            {!isLoggedIn && (
+              <>
+                <button
+                  onClick={() => navigate("/signup")}
+                  className="bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transform transition-transform duration-75 active:scale-95"
+                >
+                  User Signup
+                </button>
+
+                <button
+                  onClick={() => navigate("/admin/signup")}
+                  className="bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transform transition-transform duration-75 active:scale-95"
+                >
+                  Vendor Signup
+                </button>
+              </>
+            )}
+
+            {isLoggedIn && role === "user" && (
+              <button
+                onClick={handleShopNow}
+                className="bg-white text-black px-8 py-4 rounded-lg font-semibold flex items-center gap-2 transform transition-transform duration-75 active:scale-95"
+              >
+                Shop Now <ArrowRight />
+              </button>
+            )}
+
+            {isLoggedIn && role === "vendor" && (
+              <button
+                onClick={() => navigate("/inventory")}
+                className="bg-white text-black px-8 py-4 rounded-lg font-semibold transform transition-transform duration-75 active:scale-95"
+              >
+                Inventory Management <ArrowRight />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -72,9 +113,7 @@ const Home = () => {
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
               />
               <div className="absolute inset-0 bg-opacity-40 flex items-center justify-center">
-                <h3 className="text-gray-900 text-2xl font-bold">
-                  {cat.name}
-                </h3>
+                <h3 className="text-gray-900 text-2xl font-bold">{cat.name}</h3>
               </div>
             </div>
           ))}
@@ -112,13 +151,9 @@ const Home = () => {
                   ))}
                 </div>
 
-                <p className="text-gray-700 mb-4">
-                  “{review.text}”
-                </p>
+                <p className="text-gray-700 mb-4">“{review.text}”</p>
 
-                <h4 className="font-bold text-gray-900">
-                  {review.name}
-                </h4>
+                <h4 className="font-bold text-gray-900">{review.name}</h4>
               </div>
             ))}
           </div>
