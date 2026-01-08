@@ -72,9 +72,9 @@ const Home = () => {
             {isLoggedIn && role === "vendor" && (
               <button
                 onClick={() => navigate("/inventory")}
-                className="bg-white text-black px-8 py-4 rounded-lg font-semibold transform transition-transform duration-75 active:scale-95"
+                className="bg-white text-black px-8 py-4 rounded-lg font-semibold transform transition-transform duration-75 active:scale-95 hover:bg-gray-200"
               >
-                Inventory Management <ArrowRight />
+                Inventory Management
               </button>
             )}
           </div>
