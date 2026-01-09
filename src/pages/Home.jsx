@@ -27,7 +27,7 @@ const Home = () => {
 
         <div className="relative max-w-7xl mx-auto px-6 text-white">
           <h1 className="text-5xl md:text-6xl font-bold mb-4">
-            Discover Your Style
+           Shop Fast. Shop Nova.
           </h1>
           <p className="text-xl md:text-2xl mb-8 max-w-2xl">
             Explore our curated collection of premium fashion for everyone

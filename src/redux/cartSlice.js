@@ -21,8 +21,7 @@ const cartSlice = createSlice({
       const existingItem = state.items.find(
         (item) =>
           item.product_id === action.payload.product_id &&
-          item.size === action.payload.size &&
-          item.color === action.payload.color
+          item.size === action.payload.size 
       );
 
       if (existingItem) {

@@ -47,8 +47,8 @@ const Navbar = () => {
                 </button>
               )}
 
-              <Link to="/" className="text-2xl font-bold">
-                StyleHub
+              <Link to="/" className="h-20 w-50">
+                <img src="/logo.png" alt="logo" />
               </Link>
             </div>
 

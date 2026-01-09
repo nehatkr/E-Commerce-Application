@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from "react";
-import productsData from "../data/products.json";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { updateProduct } from "../redux/productsSlice";
 
 const EditProducts = () => {
-  const [products, setProducts] = useState([]);
+  const dispatch = useDispatch();
+  const products = useSelector((state) => state.products?.items || []);
+
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({});
-
-  // Load products from JSON
-  useEffect(() => {
-    setProducts(productsData.products || []);
-  }, []);
 
   const startEdit = (product) => {
     setEditingId(product.id);
@@ -20,38 +18,36 @@ const EditProducts = () => {
       discountedPrice: product.discountedPrice,
       stock: product.stock,
       sizes: product.sizes?.join(", ") || "",
-      colors: product.colors?.join(", ") || "",
       addToCartEnabled: product.addToCartEnabled,
     });
   };
 
   const saveEdit = (id) => {
-    const updated = products.map((p) =>
-      p.id === id
-        ? {
-            ...p,
-            category: form.category,
-            price: Number(form.price),
-            discountPercentage: Number(form.discountPercentage),
-            discountedPrice: Number(form.discountedPrice),
-            stock: Number(form.stock),
-            sizes: form.sizes.split(",").map((s) => s.trim()),
-            colors: form.colors.split(",").map((c) => c.trim()),
-            addToCartEnabled: form.addToCartEnabled,
-          }
-        : p
+    dispatch(
+      updateProduct({
+        id,
+        updates: {
+          category: form.category,
+          price: Number(form.price),
+          discountPercentage: Number(form.discountPercentage),
+          discountedPrice: Number(form.discountedPrice),
+          stock: Number(form.stock),
+          sizes: form.sizes
+            ? form.sizes.split(",").map((s) => s.trim())
+            : [],
+          addToCartEnabled: form.addToCartEnabled,
+        },
+      })
     );
 
-    setProducts(updated);
     setEditingId(null);
-
-    // 🔮 FUTURE BACKEND PLACE
-    // api.updateProduct(id, updatedProduct)
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12 mt-16">
-      <h1 className="text-3xl font-bold mb-8">Admin · Edit Products</h1>
+      <h1 className="text-3xl font-bold mb-8">
+        Vendor · Inventory Editor
+      </h1>
 
       <div className="overflow-x-auto bg-white shadow rounded-xl">
         <table className="w-full text-sm">
@@ -65,7 +61,6 @@ const EditProducts = () => {
               <th className="p-4">Final Price</th>
               <th className="p-4">Stock</th>
               <th className="p-4">Sizes</th>
-              <th className="p-4">Colors</th>
               <th className="p-4">Cart</th>
               <th className="p-4">Action</th>
             </tr>
@@ -77,14 +72,19 @@ const EditProducts = () => {
                 {/* IMAGE */}
                 <td className="p-4">
                   <img
-                    src={product.images.thumbnail}
+                    src={
+                      product.images?.thumbnail ||
+                      "https://via.placeholder.com/80"
+                    }
                     alt={product.name}
                     className="w-14 h-14 object-cover rounded"
                   />
                 </td>
 
                 {/* ID */}
-                <td className="p-4 font-mono">{product.id}</td>
+                <td className="p-4 font-mono text-xs">
+                  {product.id}
+                </td>
 
                 {/* CATEGORY */}
                 <td className="p-4">
@@ -122,7 +122,7 @@ const EditProducts = () => {
                   )}
                 </td>
 
-                {/* DISCOUNT % */}
+                {/* DISCOUNT */}
                 <td className="p-4">
                   {editingId === product.id ? (
                     <input
@@ -235,9 +235,11 @@ const EditProducts = () => {
         </table>
       </div>
 
-      <p className="text-gray-500 text-sm mt-4">
-        ⚠️ Currently using local JSON data. Backend API can be plugged in later.
-      </p>
+      {products.length === 0 && (
+        <p className="text-center text-gray-500 mt-10">
+          No products available. Add items from Inventory.
+        </p>
+      )}
     </div>
   );
 };

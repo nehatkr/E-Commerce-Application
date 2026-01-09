@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from "react";
-import productsData from "../data/products.json";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../redux/cartSlice";
 import { useNavigate } from "react-router-dom";
@@ -9,27 +8,25 @@ const ITEMS_PER_PAGE = 8;
 const Products = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isLoggedIn } = useSelector((state) => state.auth);
 
+  const { isLoggedIn } = useSelector((state) => state.auth);
+  const products = useSelector((state) => state.products?.items || []); // ✅ Redux source
 
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [page, setPage] = useState(1);
 
-  // ✅ Category filtering (memoized)
- const filteredProducts = useMemo(() => {
-  const allProducts = Array.isArray(productsData?.products)
-    ? productsData.products
-    : [];
+  // ✅ Filter products (memoized)
+  const filteredProducts = useMemo(() => {
+    if (!Array.isArray(products)) return [];
 
-  return selectedCategory === "all"
-    ? allProducts
-    : allProducts.filter(
-        (product) => product.category === selectedCategory
-      );
-}, [productsData, selectedCategory]);
+    if (selectedCategory === "all") return products;
 
+    return products.filter(
+      (product) => product.category === selectedCategory
+    );
+  }, [products, selectedCategory]);
 
-  // ✅ Pagination logic
+  // ✅ Pagination (Load More)
   const paginatedProducts = filteredProducts.slice(
     0,
     page * ITEMS_PER_PAGE
@@ -44,7 +41,7 @@ const Products = () => {
             key={cat}
             onClick={() => {
               setSelectedCategory(cat);
-              setPage(1); // reset pagination on category change
+              setPage(1);
             }}
             className={`px-5 py-2 rounded-full font-medium transition ${
               selectedCategory === cat
@@ -67,14 +64,19 @@ const Products = () => {
           >
             {/* IMAGE */}
             <img
-              src={product.images.thumbnail}
+              src={
+                product.images?.thumbnail ||
+                "https://via.placeholder.com/300"
+              }
               alt={product.name}
               className="h-64 w-full object-cover"
             />
 
             {/* CONTENT */}
             <div className="p-4">
-              <h3 className="text-lg font-semibold">{product.name}</h3>
+              <h3 className="text-lg font-semibold">
+                {product.name}
+              </h3>
 
               <p className="text-sm text-gray-500 mt-1 line-clamp-2">
                 {product.shortDescription}
@@ -85,6 +87,7 @@ const Products = () => {
                 <span className="text-xl font-bold">
                   ${product.discountedPrice}
                 </span>
+
                 {product.discountPercentage > 0 && (
                   <span className="text-sm line-through text-gray-400">
                     ${product.price}
@@ -93,7 +96,7 @@ const Products = () => {
               </div>
 
               {/* SIZES */}
-              {Array.isArray(product.sizes) && (
+              {Array.isArray(product.sizes) && product.sizes.length > 0 && (
                 <div className="flex gap-2 mt-3 flex-wrap">
                   {product.sizes.map((size) => (
                     <span
@@ -110,17 +113,16 @@ const Products = () => {
               {isLoggedIn && product.addToCartEnabled && (
                 <button
                   onClick={(e) => {
-                    e.stopPropagation(); // 🚫 prevent navigation
+                    e.stopPropagation();
                     dispatch(
                       addToCart({
                         id: product.id,
                         product_id: product.id,
                         name: product.name,
                         price: product.discountedPrice,
-                        image_url: product.images.thumbnail,
+                        image_url: product.images?.thumbnail,
                         quantity: 1,
                         size: product.sizes?.[0] || null,
-                        color: product.colors?.[0] || null,
                       })
                     );
                   }}
@@ -134,7 +136,7 @@ const Products = () => {
         ))}
       </div>
 
-      {/* LOAD MORE BUTTON */}
+      {/* LOAD MORE */}
       {paginatedProducts.length < filteredProducts.length && (
         <div className="flex justify-center mt-10">
           <button

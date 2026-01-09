@@ -8,7 +8,7 @@ const Footer = () => {
         {/* Brand Section */}
         <div>
           <h2 className="text-2xl font-semibold text-white mb-4">
-            StyleHub
+           NovaShop
           </h2>
           <p className="text-sm leading-relaxed">
             Your destination for premium quality clothing and fashion.
