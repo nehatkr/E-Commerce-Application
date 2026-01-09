@@ -1,16 +1,13 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import productsData from "../data/products.json";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../redux/cartSlice";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
 
-  const products = Array.isArray(productsData?.products)
-    ? productsData.products
-    : [];
+  const products = useSelector((state) => state.products?.items || [])
 
   const product = products.find((p) => p.id === id);
 
@@ -32,7 +29,7 @@ const ProductDetails = () => {
       <div>
         <h1 className="text-3xl font-bold">{product.name}</h1>
         <p className="text-gray-600 mt-2">
-          {product.fullDescription}
+          {product.description}
         </p>
 
         <div className="mt-4">
