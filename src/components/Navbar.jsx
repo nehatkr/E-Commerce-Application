@@ -138,7 +138,16 @@ const Navbar = () => {
                   {/* VENDOR MENU */}
                   {user?.role === "vendor" && (
                     <>
-                      <li>
+                      <li className="hover:text-gray-600 font-bold flex items-center gap-2">
+                        <Link
+                          to="/vendor/dashboard"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          Dashboard
+                        </Link>
+                      </li>
+
+                      <li className="hover:text-gray-600 font-bold flex items-center gap-2">
                         <Link
                           to="/inventory"
                           onClick={() => setIsMenuOpen(false)}
@@ -147,7 +156,7 @@ const Navbar = () => {
                         </Link>
                       </li>
 
-                      <li className="text-gray-800 hover:text-gray-600 font-bold flex items-center gap-2">
+                      <li className=" hover:text-gray-600 font-bold flex items-center gap-2">
                         <Link
                           to="/admin/edit-products"
                           onClick={() => setIsMenuOpen(false)}
