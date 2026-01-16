@@ -1,19 +1,22 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
 
 const Signup = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
   const [formData, setFormData] = useState({
     firstName: "",
     middleName: "",
     lastName: "",
     gender: "",
     email: "",
-    address1: "",
-    address2: "",
-    address3: "",
-    pincode: "",
-    phone: "",
+    addressL1: "",
+    addressL2: "",
+    addressL3: "",
+    pinCode: "",
+    phoneNumber: "",
     password: "",
     confirmPassword: "",
   });
@@ -32,20 +35,55 @@ const Signup = () => {
       tempErrors.phone = "Invalid 10-digit Phone";
     if (!formData.password || formData.password.length < 6)
       tempErrors.password = "Password must be at least 6 chars";
-    if (passwordRegex.password !== formData.confirmPassword)
+    if (formData.password !== formData.confirmPassword)
       tempErrors.confirmPassword = "Passwords do not match";
 
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validate()) {
-      alert("Account Created Successfully! Please Login.");
+
+    if (!validate()) return;
+
+    try {
+      const payload = {
+        firstName: formData.firstName,
+        middleName: formData.middleName || "",
+        lastName: formData.lastName,
+        gender: formData.gender,
+        email: formData.email,
+        password: formData.password,
+        addressL1: formData.addressL1,
+        addressL2: formData.addressL2 || "",
+        addressL3: formData.addressL3 || "",
+        pinCode: formData.pinCode,
+        phoneNumber: formData.phoneNumber,
+        role: "user",
+      };
+
+      await axios.post(
+        "https://intern-app-ecommerce-production.up.railway.app/api/users",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      alert("Account created successfully!");
       navigate("/login");
+    } catch (error) {
+      console.error(error.response?.data || error.message);
+      alert("Signup failed. Please check details.");
     }
   };
+
+  {
+    apiError && <p className="text-red-600 text-sm text-center">{apiError}</p>;
+  }
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -99,20 +137,20 @@ const Signup = () => {
           <span className="text-red-500 text-xs">{errors.email}</span>
 
           <input
-            name="address1"
+            name="addressL1"
             placeholder="Address Line 1"
             onChange={handleChange}
             className="input-field"
             required
           />
           <input
-            name="address2"
+            name="addressL2"
             placeholder="Address Line 2"
             onChange={handleChange}
             className="input-field"
           />
           <input
-            name="address3"
+            name="addressL3"
             placeholder="Address Line 3"
             onChange={handleChange}
             className="input-field"
@@ -120,7 +158,7 @@ const Signup = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <input
-              name="pincode"
+              name="pinCode"
               placeholder="Pin Code"
               onChange={handleChange}
               className="input-field"
@@ -157,10 +195,16 @@ const Signup = () => {
 
           <button
             type="submit"
-            className="w-full py-3 bg-gray-900 text-white rounded hover:bg-gray-800 font-bold transform transition-transform duration-75 active:scale-95"
+            disabled={loading}
+            className={`w-full py-3 rounded font-bold transition ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-gray-900 text-white hover:bg-gray-800"
+            }`}
           >
-            Sign Up
+            {loading ? "Creating Account..." : "Sign Up"}
           </button>
+
           <div className="text-center mt-2">
             <Link to="/login" className="text-sm text-blue-600">
               Already have an account? Sign In
