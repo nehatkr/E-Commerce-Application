@@ -31,8 +31,8 @@ const Signup = () => {
     if (!formData.firstName) tempErrors.firstName = "First Name is required";
     if (!formData.lastName) tempErrors.lastName = "Last Name is required";
     if (!emailRegex.test(formData.email)) tempErrors.email = "Invalid Email";
-    if (!phoneRegex.test(formData.phone))
-      tempErrors.phone = "Invalid 10-digit Phone";
+    if (!phoneRegex.test(formData.phoneNumber))
+      tempErrors.phoneNumber = "Invalid 10-digit Phone";
     if (!formData.password || formData.password.length < 6)
       tempErrors.password = "Password must be at least 6 chars";
     if (formData.password !== formData.confirmPassword)
@@ -62,6 +62,8 @@ const Signup = () => {
         phoneNumber: formData.phoneNumber,
         role: "user",
       };
+
+      console.log("Signup Payload: ", payload)
 
       await axios.post(
         "https://intern-app-ecommerce-production.up.railway.app/api/users",
@@ -165,7 +167,7 @@ const Signup = () => {
               required
             />
             <input
-              name="phone"
+              name="phoneNumber"
               placeholder="Phone Number *"
               onChange={handleChange}
               className="input-field"
