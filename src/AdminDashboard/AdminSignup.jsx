@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
+
 
 const AdminSignup = () => {
   const [formData, setFormData] = useState({
@@ -12,10 +14,11 @@ const AdminSignup = () => {
     permanentAddress: "",
     shopAddress: "",
     pinCode: "",
-    phoneNo:"",
+    phoneNo: "",
     gstNumber: "",
     password: "",
     confirmPassword: "",
+    role: "vendor"
   });
 
   const handleChange = (e) => {
@@ -26,31 +29,56 @@ const AdminSignup = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
+  if (formData.password !== formData.confirmPassword) {
+    alert("Passwords do not match");
+    return;
+  }
 
-    // 🔮 Future backend integration
-    console.log("Admin/Vendor Signup Data:", formData);
-
-    /*
-      fetch("/api/admin/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      })
-    */
+  // ✅ Map frontend → backend payload
+  const payload = {
+    firstName: formData.firstName,
+    lastName: formData.lastName,
+    email: formData.email,
+    gender: formData.gender,
+    shopName: formData.shopName,
+    website: formData.website,
+    gstNumber: formData.gstNumber,
+    permanentAddress: formData.permanentAddress,
+    shopAddress: formData.shopAddress,
+    pinCode: Number(formData.pinCode),
+    phoneNo: Number(formData.phoneNo),
+    password: formData.password,
+    confirmPassword: formData.confirmPassword,
+    role: "vendor",
   };
+
+  try {
+    const res = await axios.post(
+      "https://intern-app-ecommerce-production.up.railway.app/api/vendors",
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    alert("Vendor registered successfully 🎉");
+    console.log(res.data);
+
+  } catch (error) {
+    console.error("Signup error:", error.response?.data || error.message);
+    alert(error.response?.data?.message || "Signup failed");
+  }
+};
+
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10 mt-16">
-      <h2 className="text-3xl font-bold mb-8 text-center">
-         Vendor Signup
-      </h2>
+      <h2 className="text-3xl font-bold mb-8 text-center">Vendor Signup</h2>
 
       <form
         onSubmit={handleSubmit}
@@ -160,13 +188,12 @@ const AdminSignup = () => {
               className="input"
               required
             />
-             <input
-              name="phoneNo."
+            <input
+              name="phoneNo"
               placeholder="Mobile"
               value={formData.phoneNo}
               onChange={handleChange}
-              className="number"
-              max={12}
+              className="input"
               required
             />
           </div>
@@ -204,11 +231,11 @@ const AdminSignup = () => {
         >
           Register as Vendor
         </button>
-         <div className="text-center mt-2">
-            <Link to="/login" className="text-sm text-blue-600">
-              Already have an account? Sign In
-            </Link>
-          </div>
+        <div className="text-center mt-2">
+          <Link to="/login" className="text-sm text-blue-600">
+            Already have an account? Sign In
+          </Link>
+        </div>
       </form>
     </div>
   );
