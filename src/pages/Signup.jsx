@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { login } from "../redux/authSlice";
 
 const Signup = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState("");
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     firstName: "",
     middleName: "",
@@ -63,7 +66,7 @@ const Signup = () => {
         role: "user",
       };
 
-      console.log("Signup Payload: ", payload)
+      console.log("Signup Payload: ", payload);
 
       await axios.post(
         "https://intern-app-ecommerce-production.up.railway.app/api/users",
@@ -75,8 +78,15 @@ const Signup = () => {
         }
       );
 
-      alert("Account created successfully!");
-      navigate("/login");
+      dispatch(
+        login({
+          firstName: payload.firstName,
+          email: payload.email,
+          role: "user",
+        })
+      );
+
+      navigate("/");
     } catch (error) {
       console.error(error.response?.data || error.message);
       alert("Signup failed. Please check details.");

@@ -13,53 +13,47 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
+const handleLogin = async (e) => {
+  e.preventDefault();
+  setError("");
 
-    try {
-      const response = await axios.post(
-        "https://intern-app-ecommerce-production.up.railway.app/api/auth/login",
-        {
-          email,
-          password,
-          role,
-        }
-      );
+  try {
+    const response = await axios.post(
+      "https://intern-app-ecommerce-production.up.railway.app/api/auth/login",
+      { email, password, role }
+    );
 
-      const user = response.data;
+    const user = response.data;
+    console.log("Respo: ", response.data)
 
-      // ✅ Save user in Redux
-      dispatch(
-        login({
-          id: user.id,
-          firstName: user.firstName,
-          email: user.email,
-          role: user.role,
-          // token: user.token, // optional
-        })
-      );
+    const normalizedUser = {
+      id: user.id,
+      firstName: user.firstName,
+      email: user.email,
+      role: user?.role?.toLowerCase(),
+    };
 
-      // ✅ Optional: persist login
-      // localStorage.setItem("token", user.token);
-      // localStorage.setItem("user", JSON.stringify(user));
+    dispatch(login(normalizedUser));
 
-      // ✅ Role-based redirect
-      if (user.role === "vendor") {
-        navigate("/inventory");
-      } else {
-        navigate("/");
-      }
-    } catch (err) {
-      console.error(err);
-
-      if (err.response) {
-        setError(err.response.data.message || "Invalid credentials");
-      } else {
-        setError("Server not reachable. Try again later.");
-      }
+    if (normalizedUser.role === "vendor") {
+      navigate("/inventory");
+    } else {
+      navigate("/");
     }
-  };
+
+  } catch (err) {
+  console.error(err);
+
+  if (err.response) {
+    setError(err.response?.data?.message || "Invalid credentials");
+  } else if (err.request) {
+    setError("Server not reachable. Please try again later.");
+  } else {
+    setError("Something went wrong.");
+  }
+}
+};
+
 
   return (
     <div className="min-h-screen bg-gray-300 flex items-center justify-center mt-10">
