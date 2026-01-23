@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 
 const AdminSignup = () => {
+    const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -67,6 +68,8 @@ const AdminSignup = () => {
     );
 
     alert("Vendor registered successfully 🎉");
+          navigate("/login");
+
     console.log(res.data);
 
   } catch (error) {

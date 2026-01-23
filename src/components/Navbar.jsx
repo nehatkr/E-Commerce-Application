@@ -9,7 +9,8 @@ const Navbar = () => {
   const { isLoggedIn, user } = useSelector((state) => state.auth);
   const cartItems = useSelector((state) => state.cart.items);
 
-  const role = user?.role;
+  // ✅ Normalize role defensively
+  const role = user?.role?.toLowerCase();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();

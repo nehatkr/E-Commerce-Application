@@ -3,6 +3,9 @@ import { useDispatch } from "react-redux";
 import { addProduct } from "../redux/productsSlice";
 
 const Inventory = () => {
+  const [images, setImages] = useState([]);
+const [previews, setPreviews] = useState([]);
+
   const dispatch = useDispatch();
   //   const { user } = useSelector((state) => state.auth);
 
@@ -23,7 +26,6 @@ const Inventory = () => {
     image: null,
   });
 
-  const [preview, setPreview] = useState(null);
 
   // ✅ auto calculate discounted price (same logic)
   useEffect(() => {
@@ -39,14 +41,18 @@ const Inventory = () => {
     }
   }, [form.originalPrice, form.discount]);
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const imageURL = URL.createObjectURL(file);
-      setPreview(imageURL);
-      setForm({ ...form, image: imageURL });
-    }
-  };
+const handleFileChange = (e) => {
+  const files = Array.from(e.target.files);
+
+  setImages(files);
+
+  const previewUrls = files.map((file) =>
+    URL.createObjectURL(file)
+  );
+
+  setPreviews(previewUrls);
+};
+
 
   const handleSizeChange = (e) => {
     const values = [...e.target.selectedOptions].map((option) => option.value);
@@ -95,7 +101,7 @@ const Inventory = () => {
       description: "",
       image: null,
     });
-    setPreview(null);
+    setPreviews(null);
   };
 
   return (
@@ -188,22 +194,30 @@ const Inventory = () => {
             readOnly
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Product Image
+            Product Images
           </label>
+
           <input
             type="file"
+            multiple
+            accept="image/*"
             onChange={handleFileChange}
             className="block w-full text-sm text-gray-500"
           />
-          {preview && (
-            <img
-              src={preview}
-              alt="Preview"
-              className="mt-4 h-32 w-32 object-cover rounded-md border"
-            />
+
+          {previews.length > 0 && (
+            <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+              {previews.map((src, index) => (
+                <img
+                  key={index}
+                  src={src}
+                  alt={`Preview ${index}`}
+                  className="h-32 w-32 object-cover rounded-md border"
+                />
+              ))}
+            </div>
           )}
         </div>
 
