@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { addProduct } from "../redux/productsSlice";
+import axios from "axios";
+import { useSelector } from "react-redux";
+
 
 const Inventory = () => {
+  const { user } = useSelector((state) => state.auth);
   const [images, setImages] = useState([]);
 const [previews, setPreviews] = useState([]);
 
@@ -59,37 +63,41 @@ const handleFileChange = (e) => {
     setForm({ ...form, sizes: values });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!form.name || !form.originalPrice) {
-      alert("Fill required fields");
-      return;
-    }
+  try {
+    const formData = new FormData();
 
-    // ✅ ONLY REDUX ADDITION
-    dispatch(
-      addProduct({
-        id: Date.now().toString(),
-        name: form.name,
-        category: form.category,
-        price: Number(form.originalPrice),
-        discountPercentage: Number(form.discount),
-        discountedPrice: Number(form.discountedPrice),
-        stock: Number(form.quantity),
-        sizes: form.sizes,
-        shortDescription: form.description,
-        images: {
-          thumbnail:
-            form.image || "https://via.placeholder.com/300x400?text=Product",
+    // ✅ EXACT BACKEND FIELD NAMES
+    formData.append("name", form.name);
+    formData.append("category", form.category);
+    formData.append("quantity", form.quantity);
+    formData.append("originalPrice", form.originalPrice);
+    formData.append("discount", form.discount || 0);
+    formData.append("discountPrice", form.discountedPrice);
+    formData.append("description", form.description);
+
+    // ✅ Backend expects "S,L"
+    formData.append("sizes", form.sizes.join(","));
+
+    // ✅ Multiple images
+    images.forEach((img) => {
+      formData.append("images", img);
+    });
+
+    await axios.post(
+      "https://intern-app-ecommerce-production.up.railway.app/api/product",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
         },
-        addToCartEnabled: true,
-      })
+      }
     );
 
-    alert("Product Added Successfully");
+    alert("✅ Product added successfully");
 
-    // reset form
     setForm({
       name: "",
       category: "men",
@@ -99,10 +107,16 @@ const handleFileChange = (e) => {
       discount: "",
       discountedPrice: "",
       description: "",
-      image: null,
     });
-    setPreviews(null);
-  };
+    setImages([]);
+    setPreviews([]);
+
+  } catch (err) {
+    console.error(err);
+    alert("❌ Failed to add product");
+  }
+};
+
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-4 mt-16">
@@ -114,14 +128,7 @@ const handleFileChange = (e) => {
         onSubmit={handleSubmit}
         className="bg-white p-6 shadow-lg rounded-lg space-y-6 border-gray-900"
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <input
-            className="input-field"
-            placeholder="Product ID"
-            value={form.id}
-            onChange={(e) => setForm({ ...form, id: e.target.value })}
-            required
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> 
           <input
             className="input-field"
             placeholder="Product Name *"

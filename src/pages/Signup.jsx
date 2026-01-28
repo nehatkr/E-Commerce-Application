@@ -58,6 +58,7 @@ const Signup = () => {
         gender: formData.gender,
         email: formData.email,
         password: formData.password,
+        confirmPassword: formData.confirmPassword,
         addressL1: formData.addressL1,
         addressL2: formData.addressL2 || "",
         addressL3: formData.addressL3 || "",
