@@ -4,14 +4,12 @@ import { addProduct } from "../redux/productsSlice";
 import axios from "axios";
 import { useSelector } from "react-redux";
 
-
 const Inventory = () => {
   const { user } = useSelector((state) => state.auth);
   const [images, setImages] = useState([]);
-const [previews, setPreviews] = useState([]);
+  const [previews, setPreviews] = useState([]);
 
   const dispatch = useDispatch();
-  //   const { user } = useSelector((state) => state.auth);
 
   // // 🔐 Vendor-only access
   // if (user?.role !== "vendor") {
@@ -30,7 +28,6 @@ const [previews, setPreviews] = useState([]);
     image: null,
   });
 
-
   // ✅ auto calculate discounted price (same logic)
   useEffect(() => {
     if (form.originalPrice && form.discount) {
@@ -45,78 +42,76 @@ const [previews, setPreviews] = useState([]);
     }
   }, [form.originalPrice, form.discount]);
 
-const handleFileChange = (e) => {
-  const files = Array.from(e.target.files);
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
 
-  setImages(files);
+    setImages(files);
 
-  const previewUrls = files.map((file) =>
-    URL.createObjectURL(file)
-  );
+    const previewUrls = files.map((file) => URL.createObjectURL(file));
 
-  setPreviews(previewUrls);
-};
-
+    setPreviews(previewUrls);
+  };
 
   const handleSizeChange = (e) => {
     const values = [...e.target.selectedOptions].map((option) => option.value);
     setForm({ ...form, sizes: values });
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  try {
-    const formData = new FormData();
+    try {
+      const formData = new FormData();
 
-    // ✅ EXACT BACKEND FIELD NAMES
-    formData.append("name", form.name);
-    formData.append("category", form.category);
-    formData.append("quantity", form.quantity);
-    formData.append("originalPrice", form.originalPrice);
-    formData.append("discount", form.discount || 0);
-    formData.append("discountPrice", form.discountedPrice);
-    formData.append("description", form.description);
+      // ✅ EXACT BACKEND FIELD NAMES
+      formData.append("name", form.name);
+      formData.append("category", form.category);
+      formData.append("quantity", form.quantity);
+      formData.append("originalPrice", form.originalPrice);
+      formData.append("discount", form.discount || 0);
+      formData.append("discountPrice", form.discountedPrice);
+      formData.append("description", form.description);
 
-    // ✅ Backend expects "S,L"
-    formData.append("sizes", form.sizes.join(","));
+      // ✅ Backend expects "S,L"
+      formData.append("sizes", form.sizes.join(","));
+      formData.append("vendorId", user.id);
+      formData.append("vendorName", user.firstName);
+      formData.append("shopName", user.shopName);
 
-    // ✅ Multiple images
-    images.forEach((img) => {
-      formData.append("images", img);
-    });
+      // ✅ Multiple images
+      images.forEach((img) => {
+        formData.append("images", img);
+      });
 
-    await axios.post(
-      "https://intern-app-ecommerce-production.up.railway.app/api/product",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+      await axios.post(
+        "https://intern-app-ecommerce-production.up.railway.app/api/product",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
-    alert("✅ Product added successfully");
+      alert("✅ Product added successfully");
 
-    setForm({
-      name: "",
-      category: "men",
-      sizes: [],
-      quantity: "",
-      originalPrice: "",
-      discount: "",
-      discountedPrice: "",
-      description: "",
-    });
-    setImages([]);
-    setPreviews([]);
-
-  } catch (err) {
-    console.error(err);
-    alert("❌ Failed to add product");
-  }
-};
-
+      setForm({
+        name: "",
+        category: "men",
+        sizes: [],
+        quantity: "",
+        originalPrice: "",
+        discount: "",
+        discountedPrice: "",
+        description: "",
+      });
+      setImages([]);
+      setPreviews([]);
+    } catch (err) {
+      console.error(err);
+      alert("❌ Failed to add product");
+    }
+  };
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-4 mt-16">
@@ -128,7 +123,7 @@ const handleSubmit = async (e) => {
         onSubmit={handleSubmit}
         className="bg-white p-6 shadow-lg rounded-lg space-y-6 border-gray-900"
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <input
             className="input-field"
             placeholder="Product Name *"
