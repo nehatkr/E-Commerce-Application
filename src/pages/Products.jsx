@@ -1,7 +1,9 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../redux/cartSlice";
 import { useNavigate } from "react-router-dom";
+import { fetchProducts } from "../redux/productsSlice";
+import ProductSkeleton from "./ProductSkeleton";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -10,30 +12,35 @@ const Products = () => {
   const navigate = useNavigate();
 
   const { isLoggedIn } = useSelector((state) => state.auth);
-  const products = useSelector((state) => state.products?.items || []); // ✅ Redux source
+  const { items: products = [], loading } = useSelector(
+    (state) => state.products
+  );
 
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [page, setPage] = useState(1);
 
-  // ✅ Filter products (memoized)
+  // const getProductImageUrl = (productId) => {
+  //   return `https://intern-app-ecommerce-production.up.railway.app/api/product/image/${productId}?index=0`;
+  // };
+
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
+
   const filteredProducts = useMemo(() => {
-    if (!Array.isArray(products)) return [];
-
     if (selectedCategory === "all") return products;
-
-    return products.filter(
-      (product) => product.category === selectedCategory
-    );
+    return products.filter((p) => p.category === selectedCategory);
   }, [products, selectedCategory]);
 
-  // ✅ Pagination (Load More)
-  const paginatedProducts = filteredProducts.slice(
-    0,
-    page * ITEMS_PER_PAGE
-  );
+  const paginatedProducts = filteredProducts.slice(0, page * ITEMS_PER_PAGE);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 mt-16">
+      {/* LOADING */}
+      {loading && (
+        <p className="text-center text-gray-500">Loading products...</p>
+      )}
+
       {/* CATEGORY FILTER */}
       <div className="flex flex-wrap gap-4 mb-10">
         {["all", "men", "women", "kids", "accessories"].map((cat) => (
@@ -43,10 +50,8 @@ const Products = () => {
               setSelectedCategory(cat);
               setPage(1);
             }}
-            className={`px-5 py-2 rounded-full font-medium transition ${
-              selectedCategory === cat
-                ? "bg-black text-white"
-                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+            className={`px-5 py-2 rounded-full ${
+              selectedCategory === cat ? "bg-black text-white" : "bg-gray-200"
             }`}
           >
             {cat.toUpperCase()}
@@ -56,103 +61,85 @@ const Products = () => {
 
       {/* PRODUCTS GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {paginatedProducts.map((product) => (
-          <div
-            key={product.id}
-            className="bg-white rounded-xl shadow hover:shadow-xl transition overflow-hidden cursor-pointer"
-            onClick={() => navigate(`/products/${product.id}`)}
-          >
-            {/* IMAGE */}
-            <img
-              src={
-                product.images?.thumbnail ||
-                "https://via.placeholder.com/300"
-              }
-              alt={product.name}
-              className="h-64 w-full object-cover"
-            />
+        {loading
+          ? Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
+              <ProductSkeleton key={index} />
+            ))
+          : paginatedProducts.map((product) => (
+              <div
+                key={product.id}
+                className="bg-white rounded-xl shadow hover:shadow-xl cursor-pointer"
+                onClick={() => navigate(`/products/${product.id}`)}
+              >
+                <img
+                  src={
+                    product.images &&
+                    product.images.length > 0 &&
+                    product.images[0]?.imageUrl
+                      ? product.images[0].imageUrl
+                      : "https://via.placeholder.com/300"
+                  }
+                  alt={product.name}
+                  className="h-64 w-full object-cover"
+                  loading="lazy"
+                />
 
-            {/* CONTENT */}
-            <div className="p-4">
-              <h3 className="text-lg font-semibold">
-                {product.name}
-              </h3>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold">{product.name}</h3>
 
-              <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                {product.shortDescription}
-              </p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {product.shortDescription}
+                  </p>
 
-              {/* PRICE */}
-              <div className="mt-3 flex items-center gap-2">
-                <span className="text-xl font-bold">
-                  ${product.discountedPrice}
-                </span>
-
-                {product.discountPercentage > 0 && (
-                  <span className="text-sm line-through text-gray-400">
-                    ${product.price}
-                  </span>
-                )}
-              </div>
-
-              {/* SIZES */}
-              {Array.isArray(product.sizes) && product.sizes.length > 0 && (
-                <div className="flex gap-2 mt-3 flex-wrap">
-                  {product.sizes.map((size) => (
-                    <span
-                      key={size}
-                      className="border px-2 py-1 text-xs rounded"
-                    >
-                      {size}
+                  <div className="flex gap-2 mt-3 flex-wrap">
+                    Sizes available:
+                    <span className="border px-2 py-1 text-xs rounded">
+                      {product.sizes.join(" ,")}
                     </span>
-                  ))}
-                </div>
-              )}
+                  </div>
 
-              {/* ADD TO CART */}
-              {isLoggedIn && product.addToCartEnabled && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    dispatch(
-                      addToCart({
-                        id: product.id,
-                        product_id: product.id,
-                        name: product.name,
-                        price: product.discountedPrice,
-                        image_url: product.images?.thumbnail,
-                        quantity: 1,
-                        size: product.sizes?.[0] || null,
-                      })
-                    );
-                  }}
-                  className="mt-4 w-full bg-black text-white py-2 rounded hover:bg-gray-800"
-                >
-                  Add to Cart
-                </button>
-              )}
-            </div>
-          </div>
-        ))}
+                  <div className="mt-3 flex gap-2">
+                    <span className="text-xl font-bold">
+                      ₹{product.discountedPrice}
+                    </span>
+                    <span className="line-through text-gray-400">
+                      ₹{product.price}
+                    </span>
+                  </div>
+
+                  {isLoggedIn && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        dispatch(
+                          addToCart({
+                            id: product.id,
+                            name: product.name,
+                            price: product.discountPrice,
+                            quantity: 1,
+                          })
+                        );
+                      }}
+                      className="mt-4 w-full bg-black text-white py-2 rounded"
+                    >
+                      Add to Cart
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
       </div>
 
       {/* LOAD MORE */}
       {paginatedProducts.length < filteredProducts.length && (
         <div className="flex justify-center mt-10">
           <button
-            onClick={() => setPage((prev) => prev + 1)}
-            className="px-6 py-3 bg-black text-white rounded hover:bg-gray-800"
+            onClick={() => setPage((p) => p + 1)}
+            className="px-6 py-3 bg-black text-white rounded"
           >
             Load More
           </button>
         </div>
-      )}
-
-      {/* EMPTY STATE */}
-      {filteredProducts.length === 0 && (
-        <p className="text-center text-gray-500 mt-16">
-          No products found for this category.
-        </p>
       )}
     </div>
   );

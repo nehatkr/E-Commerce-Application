@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateProduct } from "../redux/productsSlice";
 
 const EditProducts = () => {
   const dispatch = useDispatch();
@@ -22,26 +21,26 @@ const EditProducts = () => {
     });
   };
 
-  const saveEdit = (id) => {
-    dispatch(
-      updateProduct({
-        id,
-        updates: {
-          category: form.category,
-          price: Number(form.price),
-          discountPercentage: Number(form.discountPercentage),
-          discountedPrice: Number(form.discountedPrice),
-          stock: Number(form.stock),
-          sizes: form.sizes
-            ? form.sizes.split(",").map((s) => s.trim())
-            : [],
-          addToCartEnabled: form.addToCartEnabled,
-        },
-      })
-    );
+  // const saveEdit = (id) => {
+  //   dispatch(
+  //     updateProduct({
+  //       id,
+  //       updates: {
+  //         category: form.category,
+  //         price: Number(form.price),
+  //         discountPercentage: Number(form.discountPercentage),
+  //         discountedPrice: Number(form.discountedPrice),
+  //         stock: Number(form.stock),
+  //         sizes: form.sizes
+  //           ? form.sizes.split(",").map((s) => s.trim())
+  //           : [],
+  //         addToCartEnabled: form.addToCartEnabled,
+  //       },
+  //     })
+  //   );
 
-    setEditingId(null);
-  };
+  //   setEditingId(null);
+  // };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12 mt-16">

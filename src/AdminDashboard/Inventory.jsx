@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { addProduct } from "../redux/productsSlice";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { fetchProducts } from "../redux/productsSlice";
+
 
 const Inventory = () => {
   const { user } = useSelector((state) => state.auth);
@@ -94,6 +95,9 @@ const Inventory = () => {
       );
 
       alert("✅ Product added successfully");
+            // 🔥 refresh product list everywhere
+      dispatch(fetchProducts());
+
 
       setForm({
         name: "",
