@@ -1,13 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// ✅ API CALL
+const BASE_URL = "https://intern-app-ecommerce-production.up.railway.app";
+
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
   async () => {
-    const res = await axios.get(
-      "https://intern-app-ecommerce-production.up.railway.app/api/product"
-    );
+    const res = await axios.get(`${BASE_URL}/api/product`);
     return res.data;
   }
 );
@@ -28,7 +27,6 @@ const productSlice = createSlice({
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
 
-        // 🔥 Normalize backend data for frontend
         state.items = action.payload.map((p) => ({
           id: p.id,
           name: p.name,
@@ -38,7 +36,14 @@ const productSlice = createSlice({
           discountedPrice: p.discountPrice,
           discountPercentage: p.discount,
           sizes: p.sizes ? p.sizes.split(",") : [],
-          images: p.images || [],
+          images: (p.images || [])
+            .filter((img) => img.imageUrl)
+            .map((img) => ({
+              ...img,
+              imageUrl: img.imageUrl.startsWith("http")
+                ? img.imageUrl
+                : `${BASE_URL}${img.imageUrl}`,
+            })),
           addToCartEnabled: p.quantity > 0,
         }));
       })

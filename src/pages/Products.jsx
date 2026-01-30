@@ -72,15 +72,11 @@ const Products = () => {
                 onClick={() => navigate(`/products/${product.id}`)}
               >
                 <img
-                  src={
-                    product.images &&
-                    product.images.length > 0 &&
-                    product.images[0]?.imageUrl
-                      ? product.images[0].imageUrl
-                      : "https://via.placeholder.com/300"
-                  }
+                  src={product.images?.[0]?.imageUrl}
                   alt={product.name}
-                  className="h-64 w-full object-cover"
+                  onError={(e) => {
+                    e.target.src = "/fallback.png";
+                  }}
                   loading="lazy"
                 />
 
