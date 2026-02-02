@@ -1,52 +1,117 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { fetchProducts } from "../redux/productsSlice";
+
+const BASE_URL = "https://intern-app-ecommerce-production.up.railway.app";
 
 const EditProducts = () => {
   const dispatch = useDispatch();
-  const products = useSelector((state) => state.products?.items || []);
+
+  const { items: products, loading } = useSelector((state) => state.products);
 
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({});
 
+  // ✅ FETCH PRODUCTS (VERY IMPORTANT)
+  useEffect(() => {
+    if (products.length === 0) {
+      dispatch(fetchProducts());
+    }
+  }, [dispatch]);
+
   const startEdit = (product) => {
     setEditingId(product.id);
     setForm({
-      category: product.category,
-      price: product.price,
-      discountPercentage: product.discountPercentage,
-      discountedPrice: product.discountedPrice,
-      stock: product.stock,
+      name: product.name || "",
+      category: product.category || "Men",
+
+      // 🔑 map backend → frontend
+      price: product.originalPrice ?? product.price ?? 0,
+      discountPercentage: product.discount ?? product.discountPercentage ?? 0,
+      discountedPrice: product.discountPrice ?? product.discountedPrice ?? 0,
+
+      quantity: product.quantity,
       sizes: product.sizes?.join(", ") || "",
-      addToCartEnabled: product.addToCartEnabled,
+      description: product.description || "",
+
+      addToCartEnabled: product.addToCartEnabled ?? true,
     });
   };
 
-  // const saveEdit = (id) => {
-  //   dispatch(
-  //     updateProduct({
-  //       id,
-  //       updates: {
-  //         category: form.category,
-  //         price: Number(form.price),
-  //         discountPercentage: Number(form.discountPercentage),
-  //         discountedPrice: Number(form.discountedPrice),
-  //         stock: Number(form.stock),
-  //         sizes: form.sizes
-  //           ? form.sizes.split(",").map((s) => s.trim())
-  //           : [],
-  //         addToCartEnabled: form.addToCartEnabled,
-  //       },
-  //     })
-  //   );
+  useEffect(() => {
+    if (form.price && form.discountPercentage) {
+      const discounted =
+        form.price - (form.price * form.discountPercentage) / 100;
 
-  //   setEditingId(null);
-  // };
+      setForm((prev) => ({
+        ...prev,
+        discountedPrice: Math.round(discounted),
+      }));
+    }
+  }, [form.price, form.discountPercentage]);
+
+  const saveEdit = async (id) => {
+    try {
+      if (
+        form.name === undefined ||
+        form.price === undefined ||
+        form.discountPercentage === undefined ||
+        form.quantity === undefined
+      ) {
+        alert("Some required fields are missing");
+        return;
+      }
+
+      const formData = new FormData();
+
+      // ✅ MUST MATCH BACKEND
+      formData.append("name", form.name);
+      formData.append("category", form.category);
+      formData.append("quantity", Number(form.quantity));
+      formData.append("discount", Number(form.discountPercentage));
+      formData.append("originalPrice", Number(form.price));
+      formData.append("discountPrice", Number(form.discountedPrice));
+      formData.append("description", form.description || "");
+      formData.append(
+        "addToCartEnabled",
+        form.addToCartEnabled ? "true" : "false"
+      );
+
+      // sizes → backend accepts comma separated OR repeated key
+      form.sizes
+        .split(",")
+        .map((s) => s.trim())
+        .forEach((size) => {
+          formData.append("sizes", size);
+        });
+
+      // 🔍 DEBUG (KEEP THIS)
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
+      const res = await fetch(`${BASE_URL}/api/product/${id}`, {
+        method: "PUT",
+        body: formData, // multipart/form-data
+      });
+
+      if (!res.ok) throw new Error("Update failed");
+
+      dispatch(fetchProducts());
+      setEditingId(null);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update product");
+    }
+  };
+
+  if (loading) {
+    return <p className="text-center mt-20 text-lg">Loading inventory...</p>;
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12 mt-16">
-      <h1 className="text-3xl font-bold mb-8">
-        Vendor · Inventory Editor
-      </h1>
+      <h1 className="text-3xl font-bold mb-8">Vendor · Inventory Editor</h1>
 
       <div className="overflow-x-auto bg-white shadow rounded-xl">
         <table className="w-full text-sm">
@@ -58,7 +123,6 @@ const EditProducts = () => {
               <th className="p-4">Price</th>
               <th className="p-4">Discount %</th>
               <th className="p-4">Final Price</th>
-              <th className="p-4">Stock</th>
               <th className="p-4">Sizes</th>
               <th className="p-4">Cart</th>
               <th className="p-4">Action</th>
@@ -66,177 +130,145 @@ const EditProducts = () => {
           </thead>
 
           <tbody>
-            {products.map((product) => (
-              <tr key={product.id} className="border-t">
-                {/* IMAGE */}
-                <td className="p-4">
-                  <img
-                    src={
-                      product.images?.thumbnail ||
-                      "https://via.placeholder.com/80"
-                    }
-                    alt={product.name}
-                    className="w-14 h-14 object-cover rounded"
-                  />
-                </td>
+            {products.map((product) => {
+              const imageUrl =
+                product.images && product.images.length > 0
+                  ? `${BASE_URL}${product.images[0].imageUrl}`
+                  : "https://via.placeholder.com/80";
 
-                {/* ID */}
-                <td className="p-4 font-mono text-xs">
-                  {product.id}
-                </td>
+              return (
+                <tr key={product.id} className="border-t text-center">
+                  {/* IMAGE */}
+                  <td className="p-4">
+                    <div className="flex justify-center">
+                      <img
+                        src={imageUrl}
+                        alt={product.name}
+                        className="w-14 h-14 object-cover rounded border"
+                        onError={(e) => {
+                          e.target.src = "https://via.placeholder.com/80";
+                        }}
+                      />
+                    </div>
+                  </td>
 
-                {/* CATEGORY */}
-                <td className="p-4">
-                  {editingId === product.id ? (
-                    <select
-                      value={form.category}
-                      onChange={(e) =>
-                        setForm({ ...form, category: e.target.value })
-                      }
-                      className="border px-2 py-1"
-                    >
-                      <option value="men">Men</option>
-                      <option value="women">Women</option>
-                      <option value="kids">Kids</option>
-                      <option value="accessories">Accessories</option>
-                    </select>
-                  ) : (
-                    product.category
-                  )}
-                </td>
+                  {/* ID */}
+                  <td className="p-4 font-mono text-xs">{product.id}</td>
 
-                {/* PRICE */}
-                <td className="p-4">
-                  {editingId === product.id ? (
-                    <input
-                      type="number"
-                      value={form.price}
-                      onChange={(e) =>
-                        setForm({ ...form, price: e.target.value })
-                      }
-                      className="border px-2 py-1 w-24"
-                    />
-                  ) : (
-                    `$${product.price}`
-                  )}
-                </td>
+                  {/* CATEGORY */}
+                  <td className="p-4 text-center">
+                    {editingId === product.id ? (
+                      <select
+                        value={form.category}
+                        onChange={(e) =>
+                          setForm({ ...form, category: e.target.value })
+                        }
+                        className="border px-2 py-1"
+                      >
+                        <option value="Men">Men</option>
+                        <option value="Women">Women</option>
+                        <option value="Kids">Kids</option>
+                        <option value="Accessories">Accessories</option>
+                      </select>
+                    ) : (
+                      product.category
+                    )}
+                  </td>
 
-                {/* DISCOUNT */}
-                <td className="p-4">
-                  {editingId === product.id ? (
-                    <input
-                      type="number"
-                      value={form.discountPercentage}
-                      onChange={(e) =>
-                        setForm({
-                          ...form,
-                          discountPercentage: e.target.value,
-                        })
-                      }
-                      className="border px-2 py-1 w-20"
-                    />
-                  ) : (
-                    `${product.discountPercentage}%`
-                  )}
-                </td>
+                  {/* PRICE */}
+                  <td className="p-4 text-center">
+                    {editingId === product.id ? (
+                      <input
+                        type="number"
+                        value={form.price}
+                        onChange={(e) =>
+                          setForm({ ...form, price: e.target.value })
+                        }
+                        className="border px-2 py-1 w-24"
+                      />
+                    ) : (
+                      `₹${product.price}`
+                    )}
+                  </td>
 
-                {/* FINAL PRICE */}
-                <td className="p-4 font-semibold">
-                  {editingId === product.id ? (
-                    <input
-                      type="number"
-                      value={form.discountedPrice}
-                      onChange={(e) =>
-                        setForm({
-                          ...form,
-                          discountedPrice: e.target.value,
-                        })
-                      }
-                      className="border px-2 py-1 w-24"
-                    />
-                  ) : (
-                    `$${product.discountedPrice}`
-                  )}
-                </td>
+                  {/* DISCOUNT */}
+                  <td className="p-4 text-center">
+                    {editingId === product.id ? (
+                      <input
+                        type="number"
+                        value={form.discountPercentage}
+                        onChange={(e) =>
+                          setForm({
+                            ...form,
+                            discountPercentage: e.target.value,
+                          })
+                        }
+                        className="border px-2 py-1 w-20"
+                      />
+                    ) : (
+                      `${product.discountPercentage}%`
+                    )}
+                  </td>
 
-                {/* STOCK */}
-                <td className="p-4">
-                  {editingId === product.id ? (
-                    <input
-                      type="number"
-                      value={form.stock}
-                      onChange={(e) =>
-                        setForm({ ...form, stock: e.target.value })
-                      }
-                      className="border px-2 py-1 w-20"
-                    />
-                  ) : (
-                    product.stock
-                  )}
-                </td>
+                  {/* FINAL PRICE */}
+                  <td className="p-4 font-semibold text-center">
+                    ₹{product.discountedPrice}
+                  </td>
 
-                {/* SIZES */}
-                <td className="p-4">
-                  {editingId === product.id ? (
-                    <input
-                      value={form.sizes}
-                      onChange={(e) =>
-                        setForm({ ...form, sizes: e.target.value })
-                      }
-                      className="border px-2 py-1 w-40"
-                    />
-                  ) : (
-                    product.sizes?.join(", ")
-                  )}
-                </td>
+                  {/* SIZES */}
+                  <td className="p-4 text-center">
+                    {product.sizes?.join(", ")}
+                  </td>
 
-                {/* CART ENABLE */}
-                <td className="p-4 text-center">
-                  {editingId === product.id ? (
-                    <input
-                      type="checkbox"
-                      checked={form.addToCartEnabled}
-                      onChange={(e) =>
-                        setForm({
-                          ...form,
-                          addToCartEnabled: e.target.checked,
-                        })
-                      }
-                    />
-                  ) : product.addToCartEnabled ? (
-                    "✅"
-                  ) : (
-                    "❌"
-                  )}
-                </td>
+                  {/* CART */}
+                  <td className="p-4 text-center">
+                    {product.quantity > 0 ? "✅" : "❌"}
+                  </td>
 
-                {/* ACTION */}
-                <td className="p-4">
-                  {editingId === product.id ? (
-                    <button
-                      onClick={() => saveEdit(product.id)}
-                      className="bg-green-600 text-white px-4 py-1 rounded"
-                    >
-                      Save
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => startEdit(product)}
-                      className="bg-black text-white px-4 py-1 rounded"
-                    >
-                      Edit
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
+                  {/* ACTION */}
+                  <td className="p-4 text-center">
+                    {editingId === product.id ? (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => saveEdit(product.id)}
+                          className="bg-green-600 text-white px-3 py-1 rounded"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => setEditingId(null)}
+                          className="bg-gray-400 text-white px-3 py-1 rounded"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => startEdit(product)}
+                          className="bg-black text-white px-3 py-1 rounded"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          // onClick={() => deleteProduct(product.id)}
+                          className="bg-red-600 text-white px-3 py-1 rounded"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
 
       {products.length === 0 && (
         <p className="text-center text-gray-500 mt-10">
-          No products available. Add items from Inventory.
+          No products available.
         </p>
       )}
     </div>
