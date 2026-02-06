@@ -85,7 +85,7 @@ const Inventory = () => {
       });
 
       await axios.post(
-        "https://intern-app-ecommerce-production.up.railway.app/api/product",
+        "https://intern-app-ecommerce.onrender.com/api/product",
         formData,
         {
           headers: {

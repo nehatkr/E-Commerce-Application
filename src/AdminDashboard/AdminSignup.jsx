@@ -58,7 +58,7 @@ const AdminSignup = () => {
 
   try {
     const res = await axios.post(
-      "https://intern-app-ecommerce-production.up.railway.app/api/vendors",
+      "https://intern-app-ecommerce.onrender.com/api/vendors",
       payload,
       {
         headers: {
@@ -96,7 +96,7 @@ const AdminSignup = () => {
               placeholder="First Name"
               value={formData.firstName}
               onChange={handleChange}
-              className="input"
+              className="input p-2"
               required
             />
             <input
@@ -104,7 +104,7 @@ const AdminSignup = () => {
               placeholder="Last Name"
               value={formData.lastName}
               onChange={handleChange}
-              className="input"
+              className="input p-2"
               required
             />
             <input
@@ -113,14 +113,14 @@ const AdminSignup = () => {
               placeholder="Email"
               value={formData.email}
               onChange={handleChange}
-              className="input"
+              className="input p-2"
               required
             />
             <select
               name="gender"
               value={formData.gender}
               onChange={handleChange}
-              className="input"
+              className="input p-2"
               required
             >
               <option value="">Select Gender</option>
@@ -133,14 +133,14 @@ const AdminSignup = () => {
 
         {/* BUSINESS INFO */}
         <div>
-          <h3 className="font-semibold text-lg mb-4">Business Details</h3>
+          <h3 className="font-semibold text-lg mb-4 mt-4">Business Details</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
               name="shopName"
               placeholder="Shop Name"
               value={formData.shopName}
               onChange={handleChange}
-              className="input"
+              className="input p-2"
               required
             />
             <input
@@ -148,14 +148,14 @@ const AdminSignup = () => {
               placeholder="Website (optional)"
               value={formData.website}
               onChange={handleChange}
-              className="input"
+              className="input p-2"
             />
             <input
               name="gstNumber"
               placeholder="GST Number"
               value={formData.gstNumber}
               onChange={handleChange}
-              className="input"
+              className="input p-2"
               required
             />
           </div>
@@ -170,7 +170,7 @@ const AdminSignup = () => {
               placeholder="Permanent Address"
               value={formData.permanentAddress}
               onChange={handleChange}
-              className="input"
+              className="input p-2"
               rows={2}
               required
             />
@@ -179,16 +179,17 @@ const AdminSignup = () => {
               placeholder="Shop Address"
               value={formData.shopAddress}
               onChange={handleChange}
-              className="input"
+              className="input p-2"
               rows={2}
               required
             />
-            <input
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <input
               name="pinCode"
               placeholder="Pin Code"
               value={formData.pinCode}
               onChange={handleChange}
-              className="input"
+              className="input p-2"
               required
             />
             <input
@@ -196,9 +197,12 @@ const AdminSignup = () => {
               placeholder="Mobile"
               value={formData.phoneNo}
               onChange={handleChange}
-              className="input"
+              className="input p-2"
               required
             />
+
+             </div>
+          
           </div>
         </div>
 
@@ -212,7 +216,7 @@ const AdminSignup = () => {
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
-              className="input"
+              className="input p-2"
               required
             />
             <input
@@ -221,7 +225,7 @@ const AdminSignup = () => {
               placeholder="Confirm Password"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="input"
+              className="input p-2"
               required
             />
           </div>

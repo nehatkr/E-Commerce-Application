@@ -24,6 +24,9 @@ const cartSlice = createSlice({
           item.size === action.payload.size 
       );
 
+  // if (product.quantity <= 0) {
+  //   return; // ❌ block add to cart
+  // }
       if (existingItem) {
         existingItem.quantity += action.payload.quantity;
       } else {

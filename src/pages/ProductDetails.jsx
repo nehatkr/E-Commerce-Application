@@ -17,7 +17,7 @@ const ProductDetails = () => {
   const rating = 4.3;
   const totalReviews = 128;
 
-  const BASE_URL = "https://intern-app-ecommerce-production.up.railway.app";
+  const BASE_URL = "https://intern-app-ecommerce.onrender.com";
 
   const getImageUrl = (url) => {
     if (!url) return "/placeholder.png";
@@ -29,7 +29,7 @@ const ProductDetails = () => {
     const fetchProduct = async () => {
       try {
         const res = await axios.get(
-          `https://intern-app-ecommerce-production.up.railway.app/api/product/${id}`
+          `https://intern-app-ecommerce.onrender.com/api/product/${id}`
         );
         setProduct(res.data);
         setActiveImage(getImageUrl(res.data.images?.[0]?.imageUrl));
@@ -69,7 +69,7 @@ const ProductDetails = () => {
       <div>
         <div className="relative overflow-hidden rounded-lg group border">
           <img
-              src={getImageUrl(activeImage)}
+            src={getImageUrl(activeImage)}
             alt={product.name}
             className="w-full h-105 object-cover transition-transform duration-300 group-hover:scale-125"
             onError={(e) => {
@@ -159,20 +159,28 @@ const ProductDetails = () => {
 
         {/* 🛍️ ADD TO CART */}
         <button
-          onClick={() =>
+          disabled={product.quantity === 0}
+          onClick={(e) => {
+            e.stopPropagation();
+
+            if (product.quantity === 0) return;
+
             dispatch(
               addToCart({
                 id: product.id,
                 name: product.name,
-                price: product.discountPrice,
-                image: product.images?.[0]?.imageUrl,
-                quantity: qty,
+                price: product.discountedPrice,
+                quantity: product.quantity, // ✅ STOCK quantity
               })
-            )
-          }
-          className="mt-8 bg-black text-white px-8 py-3 rounded hover:bg-gray-800"
+            );
+          }}
+          className={`mt-4 w-full py-2 rounded ${
+            product.quantity > 0
+              ? "bg-black text-white"
+              : "bg-gray-300 cursor-not-allowed"
+          }`}
         >
-          Add to Cart
+          {product.quantity > 0 ? "Add to Cart" : "Out of Stock"}
         </button>
       </div>
     </div>

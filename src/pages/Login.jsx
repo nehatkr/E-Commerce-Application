@@ -19,7 +19,7 @@ const handleLogin = async (e) => {
 
   try {
     const response = await axios.post(
-      "https://intern-app-ecommerce-production.up.railway.app/api/auth/login",
+      "https://intern-app-ecommerce.onrender.com/api/auth/login",
       { email, password, role }
     );
 

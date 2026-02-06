@@ -105,20 +105,28 @@ const Products = () => {
 
                   {isLoggedIn && (
                     <button
+                      disabled={product.quantity === 0}
                       onClick={(e) => {
                         e.stopPropagation();
+
+                        if (product.quantity === 0) return;
+
                         dispatch(
                           addToCart({
                             id: product.id,
                             name: product.name,
-                            price: product.discountPrice,
-                            quantity: 1,
+                            price: product.discountedPrice,
+                            quantity: product.quantity, // ✅ STOCK quantity
                           })
                         );
                       }}
-                      className="mt-4 w-full bg-black text-white py-2 rounded"
+                      className={`mt-4 w-full py-2 rounded ${
+                        product.quantity > 0
+                          ? "bg-black text-white"
+                          : "bg-gray-300 cursor-not-allowed"
+                      }`}
                     >
-                      Add to Cart
+                      {product.quantity > 0 ? "Add to Cart" : "Out of Stock"}
                     </button>
                   )}
                 </div>

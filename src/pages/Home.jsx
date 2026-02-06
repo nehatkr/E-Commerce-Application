@@ -42,6 +42,7 @@ const Home = () => {
           </button> */}
 
           <div className="flex gap-4 flex-wrap">
+          
             {!isLoggedIn && (
               <>
                 <button
@@ -57,6 +58,7 @@ const Home = () => {
                 >
                   Vendor Signup
                 </button>
+               
               </>
             )}
 

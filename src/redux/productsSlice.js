@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const BASE_URL = "https://intern-app-ecommerce-production.up.railway.app";
+const BASE_URL = "https://intern-app-ecommerce.onrender.com";
 
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
@@ -33,6 +33,7 @@ const productSlice = createSlice({
           category: p.category,
           shortDescription: p.description,
           price: p.originalPrice,
+          quantity: p.quantity, 
           discountedPrice: p.discountPrice,
           discountPercentage: p.discount,
           sizes: p.sizes ? p.sizes.split(",") : [],

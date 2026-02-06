@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProducts } from "../redux/productsSlice";
+import { fetchVendorProducts } from "../redux/vendorProductsSlice";
 
-const BASE_URL = "https://intern-app-ecommerce-production.up.railway.app";
+const BASE_URL = "https://intern-app-ecommerce.onrender.com";
 
 const EditProducts = () => {
   const dispatch = useDispatch();
@@ -12,31 +12,33 @@ const EditProducts = () => {
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({});
 
+  const { user } = useSelector((state) => state.auth);
+const vendorId = user?.id;
+
+
   // ✅ FETCH PRODUCTS (VERY IMPORTANT)
-  useEffect(() => {
-    if (products.length === 0) {
-      dispatch(fetchProducts());
-    }
-  }, [dispatch]);
+useEffect(() => {
+  if (vendorId) {
+    dispatch(fetchVendorProducts(vendorId));
+  }
+}, [dispatch, vendorId]);
 
-  const startEdit = (product) => {
-    setEditingId(product.id);
-    setForm({
-      name: product.name || "",
-      category: product.category || "Men",
 
-      // 🔑 map backend → frontend
-      price: product.originalPrice ?? product.price ?? 0,
-      discountPercentage: product.discount ?? product.discountPercentage ?? 0,
-      discountedPrice: product.discountPrice ?? product.discountedPrice ?? 0,
+const startEdit = (product) => {
+  setEditingId(product.id);
+  setForm({
+    name: product.name || "",
+    category: product.category || "Men",
+    price: product.price ?? 0,
+    discountPercentage: product.discountPercentage ?? 0,
+    discountedPrice: product.discountedPrice ?? 0,
+    quantity: product.quantity ?? 0,
+    sizes: product.sizes?.join(", ") || "",
+    description: product.description || "",
+    addToCartEnabled: product.quantity > 0,
+  });
+};
 
-      quantity: product.quantity,
-      sizes: product.sizes?.join(", ") || "",
-      description: product.description || "",
-
-      addToCartEnabled: product.addToCartEnabled ?? true,
-    });
-  };
 
   useEffect(() => {
     if (form.price && form.discountPercentage) {
@@ -97,7 +99,8 @@ const EditProducts = () => {
 
       if (!res.ok) throw new Error("Update failed");
 
-      dispatch(fetchProducts());
+     dispatch(fetchVendorProducts(vendorId));
+
       setEditingId(null);
     } catch (err) {
       console.error(err);
@@ -106,7 +109,7 @@ const EditProducts = () => {
   };
 
   if (loading) {
-    return <p className="text-center mt-20 text-lg">Loading inventory...</p>;
+    return <p className="text-center mt-20 text-lg">Loading Products...</p>;
   }
 
   return (
@@ -133,23 +136,22 @@ const EditProducts = () => {
             {products.map((product) => {
               const imageUrl =
                 product.images && product.images.length > 0
-                  ? `${BASE_URL}${product.images[0].imageUrl}`
+                  ? product.images[0].imageUrl
                   : "https://via.placeholder.com/80";
 
               return (
                 <tr key={product.id} className="border-t text-center">
                   {/* IMAGE */}
                   <td className="p-4">
-                    <div className="flex justify-center">
-                      <img
-                        src={imageUrl}
-                        alt={product.name}
-                        className="w-14 h-14 object-cover rounded border"
-                        onError={(e) => {
-                          e.target.src = "https://via.placeholder.com/80";
-                        }}
-                      />
-                    </div>
+                    <img
+                      src={imageUrl}
+                      alt={product.name}
+                      loading="lazy"
+                      className="w-14 h-14 object-cover rounded border mx-auto"
+                      onError={(e) => {
+                        e.currentTarget.src = "https://via.placeholder.com/80";
+                      }}
+                    />
                   </td>
 
                   {/* ID */}
@@ -221,8 +223,8 @@ const EditProducts = () => {
                   </td>
 
                   {/* CART */}
-                  <td className="p-4 text-center">
-                    {product.quantity > 0 ? "✅" : "❌"}
+                  <td className="p-4">
+                    {product.quantity > 0 ? "✅ Available" : "❌ Out of Stock"}
                   </td>
 
                   {/* ACTION */}

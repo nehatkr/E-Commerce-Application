@@ -34,6 +34,7 @@ const Signup = () => {
     if (!formData.firstName) tempErrors.firstName = "First Name is required";
     if (!formData.lastName) tempErrors.lastName = "Last Name is required";
     if (!emailRegex.test(formData.email)) tempErrors.email = "Invalid Email";
+    if (!passwordRegex.test(formData.password)) tempErrors.password = "Invalid Password";
     if (!phoneRegex.test(formData.phoneNumber))
       tempErrors.phoneNumber = "Invalid 10-digit Phone";
     if (!formData.password || formData.password.length < 6)
@@ -70,7 +71,7 @@ const Signup = () => {
       console.log("Signup Payload: ", payload);
 
       await axios.post(
-        "https://intern-app-ecommerce-production.up.railway.app/api/users",
+        "https://intern-app-ecommerce.onrender.com/api/users",
         payload,
         {
           headers: {
