@@ -3,35 +3,22 @@ import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { ShoppingCart, User, Menu, X, Package } from "lucide-react";
 import { logout } from "../redux/authSlice";
-import CartModal from "../pages/CartModal";
 
 const Navbar = () => {
-  const { isLoggedIn, user } = useSelector((state) => state.auth);
-  const cartItems = useSelector((state) => state.cart.items);
-
-  // ✅ Normalize role defensively
-  const role = user?.role?.toLowerCase();
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const { isLoggedIn, user } = useSelector((state) => state.auth);
+  const cartItems = useSelector((state) => state.cart.items);
+
+  const role = user?.role?.toLowerCase();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login");
     setIsMenuOpen(false);
-  };
-
-  const openMenu = () => {
-    setIsCartOpen(false);
-    setIsMenuOpen(true);
-  };
-
-  const openCart = () => {
-    setIsMenuOpen(false);
-    setIsCartOpen(true);
   };
 
   return (
@@ -40,10 +27,11 @@ const Navbar = () => {
       <nav className="bg-white shadow-md fixed top-0 w-full z-40">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between h-16 items-center">
+
             {/* LEFT */}
             <div className="flex items-center gap-4">
               {isLoggedIn && (
-                <button onClick={openMenu}>
+                <button onClick={() => setIsMenuOpen(true)}>
                   <Menu size={24} />
                 </button>
               )}
@@ -57,17 +45,17 @@ const Navbar = () => {
             <div className="flex items-center gap-6">
               {isLoggedIn ? (
                 <>
+                  {/* VENDOR INVENTORY ICON */}
                   {role === "vendor" && (
                     <Link to="/inventory">
                       <Package size={24} />
                     </Link>
                   )}
 
-                  {/* CART ICON */}
+                  {/* CART ICON → CART PAGE */}
                   <button
-                    onClick={openCart}
+                    onClick={() => navigate("/cart")}
                     className="relative"
-                    aria-label="Open Cart"
                   >
                     <ShoppingCart size={24} />
                     {cartItems.length > 0 && (
@@ -80,7 +68,9 @@ const Navbar = () => {
                   {/* USER */}
                   <div className="flex items-center gap-2">
                     <User size={22} />
-                    <span className="hidden md:block">{user?.firstName}</span>
+                    <span className="hidden md:block">
+                      {user?.firstName}
+                    </span>
                   </div>
                 </>
               ) : (
@@ -124,22 +114,21 @@ const Navbar = () => {
               {isLoggedIn ? (
                 <>
                   {/* USER MENU */}
-                  {user?.role === "user" && (
+                  {role === "user" && (
+                    <li>
+                      <Link
+                        to="/products"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Shop
+                      </Link>
+                    </li>
+                  )}
+
+                  {/* VENDOR MENU */}
+                  {role === "vendor" && (
                     <>
                       <li>
-                        <Link
-                          to="/products"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          Shop
-                        </Link>
-                      </li>
-                    </>
-                  )}
-                  {/* VENDOR MENU */}
-                  {user?.role === "vendor" && (
-                    <>
-                      <li className="hover:text-gray-600 font-bold flex items-center gap-2">
                         <Link
                           to="/vendor/dashboard"
                           onClick={() => setIsMenuOpen(false)}
@@ -148,7 +137,7 @@ const Navbar = () => {
                         </Link>
                       </li>
 
-                      <li className="hover:text-gray-600 font-bold flex items-center gap-2">
+                      <li>
                         <Link
                           to="/inventory"
                           onClick={() => setIsMenuOpen(false)}
@@ -157,7 +146,7 @@ const Navbar = () => {
                         </Link>
                       </li>
 
-                      <li className=" hover:text-gray-600 font-bold flex items-center gap-2">
+                      <li>
                         <Link
                           to="/admin/edit-products"
                           onClick={() => setIsMenuOpen(false)}
@@ -203,9 +192,6 @@ const Navbar = () => {
           </div>
         </div>
       )}
-
-      {/* CART MODAL */}
-      <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
   );
 };

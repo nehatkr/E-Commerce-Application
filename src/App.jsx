@@ -17,6 +17,7 @@ import ProductDetails from "./pages/ProductDetails";
 import AdminSignup from "./AdminDashboard/AdminSignup";
 import EditProducts from "./AdminDashboard/EditProducts"; // Admin edit page
 import VendorDashboard from "./AdminDashboard/Dashboard";
+import CartPage from "./pages/CartPage";
 
 // 🔐 Protected Route (User login check)
 const ProtectedRoute = ({ children }) => {
@@ -88,6 +89,15 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Inventory />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/cart"
+              element={
+                <ProtectedRoute>
+                  <CartPage />
                 </ProtectedRoute>
               }
             />

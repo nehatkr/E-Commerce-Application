@@ -34,7 +34,8 @@ const Signup = () => {
     if (!formData.firstName) tempErrors.firstName = "First Name is required";
     if (!formData.lastName) tempErrors.lastName = "Last Name is required";
     if (!emailRegex.test(formData.email)) tempErrors.email = "Invalid Email";
-    if (!passwordRegex.test(formData.password)) tempErrors.password = "Invalid Password";
+    if (!passwordRegex.test(formData.password))
+      tempErrors.password = "Invalid Password";
     if (!phoneRegex.test(formData.phoneNumber))
       tempErrors.phoneNumber = "Invalid 10-digit Phone";
     if (!formData.password || formData.password.length < 6)
@@ -88,7 +89,7 @@ const Signup = () => {
         })
       );
 
-      navigate("/");
+      navigate("/products");
     } catch (error) {
       console.error(error.response?.data || error.message);
       alert("Signup failed. Please check details.");
@@ -110,26 +111,37 @@ const Signup = () => {
         </h2>
         <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
           <div className="grid grid-cols-2 gap-4">
+            <div className="relative">
+              <label className="block text-sm font-medium text-gray-700">First Name*</label>
+              <input
+                name="firstName"
+                placeholder=" Enter First Name"
+                onChange={handleChange}
+                className="input-field"
+                required
+              />
+            </div>
+            <div className="block text-sm font-medium text-gray-700">
+              <label className="floating-label">Middle Name*</label>
+              <input
+                name="middleName"
+                placeholder="Enter Middle Name "
+                onChange={handleChange}
+                className="input-field"
+                required
+              />
+            </div>
+          </div>
+          <div className="block text-sm font-medium text-gray-700">
+            <label className="floating-label">Last Name*</label>
             <input
-              name="firstName"
-              placeholder="First Name *"
+              name="lastName"
+              placeholder="Enter Last Name "
               onChange={handleChange}
               className="input-field"
               required
             />
-            <input
-              name="middleName"
-              placeholder="Middle Name"
-              onChange={handleChange}
-              className="input-field"
-            />
           </div>
-          <input
-            name="lastName"
-            placeholder="Last Name *"
-            onChange={handleChange}
-            className="input-field"
-          />
           <span className="text-red-500 text-xs">
             {errors.firstName || errors.lastName}
           </span>
@@ -141,61 +153,83 @@ const Signup = () => {
             <option value="Other">Others</option>
           </select>
 
-          <input
-            name="email"
-            placeholder="Email *"
-            onChange={handleChange}
-            className="input-field"
-            required
-          />
-          <span className="text-red-500 text-xs">{errors.email}</span>
-
-          <input
-            name="addressL1"
-            placeholder="Address Line 1"
-            onChange={handleChange}
-            className="input-field"
-            required
-          />
-          <input
-            name="addressL2"
-            placeholder="Address Line 2"
-            onChange={handleChange}
-            className="input-field"
-          />
-          <input
-            name="addressL3"
-            placeholder="Address Line 3"
-            onChange={handleChange}
-            className="input-field"
-          />
-
-          <div className="grid grid-cols-2 gap-4">
+          <div className="block text-sm font-medium text-gray-700">
+            <label className="floating-label">Email ID*</label>
             <input
-              name="pinCode"
-              placeholder="Pin Code"
-              onChange={handleChange}
-              className="input-field"
-              required
-            />
-            <input
-              name="phoneNumber"
-              placeholder="Phone Number *"
+              name="email"
+              placeholder="Enter Email Id "
               onChange={handleChange}
               className="input-field"
               required
             />
           </div>
+          <span className="text-red-500 text-xs">{errors.email}</span>
+          <div className="block text-sm font-medium text-gray-700">
+            <label className="floating-label">Address L1*</label>
+            <input
+              name="addressL1"
+              placeholder="Address Line 1"
+              onChange={handleChange}
+              className="input-field"
+              required
+            />
+          </div>
+          <div className="block text-sm font-medium text-gray-700">
+            <label className="floating-label">Address L2*</label>
+            <input
+              name="addressL2"
+              placeholder="Address Line 2"
+              onChange={handleChange}
+              className="input-field"
+            />
+          </div>
+          <div className="block text-sm font-medium text-gray-700">
+            <label className="floating-label">Address L3*</label>
+            <input
+              name="addressL3"
+              placeholder="Address Line 3"
+              onChange={handleChange}
+              className="input-field"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="block text-sm font-medium text-gray-700">
+              <label className="floating-label">PinCode*</label>
+              <input
+                name="pinCode"
+                placeholder="Pin Code"
+                onChange={handleChange}
+                className="input-field"
+                required
+              />
+            </div>
+            <div className="block text-sm font-medium text-gray-700">
+              <label className="floating-label">Phone Number*</label>
+              <input
+                name="phoneNumber"
+                placeholder="Phone Number *"
+                onChange={handleChange}
+                className="input-field"
+                required
+              />
+            </div>
+          </div>
           <span className="text-red-500 text-xs">{errors.phone}</span>
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password *"
-            onChange={handleChange}
-            className="input-field"
-            required
-          />
+          <div className="block text-sm font-medium text-gray-700">
+            <label className="floating-label">Address L1 *</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Password *"
+              onChange={handleChange}
+              className="input-field"
+              required
+            />
+          </div>
+            <div className="block text-sm font-medium text-gray-700">
+            <label className="floating-label">Address L1 *</label>
           <input
             type="password"
             name="confirmPassword"
@@ -203,6 +237,7 @@ const Signup = () => {
             onChange={handleChange}
             className="input-field"
           />
+          </div>
           <span className="text-red-500 text-xs">
             {errors.password || errors.confirmPassword}
           </span>

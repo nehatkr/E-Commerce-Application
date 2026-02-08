@@ -3,6 +3,15 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../redux/cartSlice";
+import {
+  Truck,
+  RefreshCw,
+  ShieldCheck,
+  Package,
+  Star,
+  CreditCard,
+} from "lucide-react";
+import { motion } from "framer-motion";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -13,7 +22,6 @@ const ProductDetails = () => {
   const [activeImage, setActiveImage] = useState("");
   const [qty, setQty] = useState(1);
 
-  /* ⭐ mock ratings (can be replaced by backend later) */
   const rating = 4.3;
   const totalReviews = 128;
 
@@ -24,7 +32,6 @@ const ProductDetails = () => {
     return url.startsWith("http") ? url : `${BASE_URL}${url}`;
   };
 
-  /* 🚀 FETCH PRODUCT BY ID */
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -43,18 +50,10 @@ const ProductDetails = () => {
     fetchProduct();
   }, [id]);
 
-  /* 🦴 SKELETON LOADER */
   if (loading) {
     return (
-      <div className="mt-24 max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-8 animate-pulse">
-        <div className="bg-gray-200 h-[420px] rounded-lg" />
-        <div className="space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-3/4" />
-          <div className="h-4 bg-gray-200 rounded w-full" />
-          <div className="h-4 bg-gray-200 rounded w-5/6" />
-          <div className="h-6 bg-gray-200 rounded w-1/3" />
-          <div className="h-12 bg-gray-200 rounded w-1/2" />
-        </div>
+      <div className="mt-24 max-w-6xl mx-auto px-4 animate-pulse">
+        Loading...
       </div>
     );
   }
@@ -64,56 +63,91 @@ const ProductDetails = () => {
   }
 
   return (
-    <div className="mt-30 max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-10">
-      {/* 🖼️ IMAGE + ZOOM */}
+    <motion.div
+      className="mt-30 max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-10 pt-10"
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      {/* 🖼️ IMAGE SECTION */}
       <div>
-        <div className="relative overflow-hidden rounded-lg group border">
+        <motion.div
+          key={activeImage}
+          className="relative overflow-hidden rounded-lg border "
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4 }}
+        >
           <img
-            src={getImageUrl(activeImage)}
+            src={activeImage}
             alt={product.name}
-            className="w-full h-105 object-cover transition-transform duration-300 group-hover:scale-125"
-            onError={(e) => {
-              e.target.src = "/placeholder.png";
-            }}
+            className="w-full h-[450px] object-cover object-top transition-transform duration-300 group-hover:scale-105"
+            onError={(e) => (e.target.src = "/placeholder.png")}
           />
-        </div>
+        </motion.div>
 
-        {/* IMAGE GALLERY */}
-        <div className="flex gap-3 mt-4 pb-20 pt-6">
-          {product.images?.map((img) => (
-            <img
-              key={img.id}
-              src={getImageUrl(activeImage)}
-              onClick={() => setActiveImage(img.imageUrl)}
-              className={`h-20 w-20 object-cover rounded cursor-pointer border ${
-                activeImage === img.imageUrl
-                  ? "border-black"
-                  : "border-gray-300"
-              }`}
-            />
-          ))}
+        {/* GALLERY */}
+        <div className="flex gap-3 mt-4 pb-15">
+          {product.images?.map((img) => {
+            const imgUrl = getImageUrl(img.imageUrl);
+            return (
+              <motion.img
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                key={img.id}
+                src={imgUrl}
+                onClick={() => setActiveImage(imgUrl)}
+                className={`h-20 w-20 object-cover rounded cursor-pointer border ${
+                  activeImage === imgUrl ? "border-black" : "border-gray-300"
+                }`}
+              />
+            );
+          })}
         </div>
       </div>
 
       {/* 📦 PRODUCT DETAILS */}
-      <div>
-        <h1 className="text-3xl font-bold">{product.name}</h1>
-
-        <p className="text-gray-600 mt-3">{product.description}</p>
-
-        {/* ⭐ RATINGS */}
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={{
+          hidden: { opacity: 0 },
+          show: {
+            opacity: 1,
+            transition: { staggerChildren: 0.15 },
+          },
+        }}
+      >
+        <motion.h1
+          className="text-3xl font-bold"
+          variants={{ hidden: { y: 20 }, show: { y: 0 } }}
+        >
+          {product.name}
+        </motion.h1>
+        <motion.p
+          className="text-gray-600 mt-3"
+          variants={{ hidden: { y: 20 }, show: { y: 0 } }}
+        >
+          {product.description}
+        </motion.p>
+        {/* ⭐ RATINGS */}{" "}
         <div className="flex items-center gap-2 mt-4">
+          {" "}
           <div className="flex text-yellow-500">
-            {"★".repeat(Math.floor(rating))}
-            {"☆".repeat(5 - Math.floor(rating))}
-          </div>
+            {" "}
+            {"★".repeat(Math.floor(rating))}{" "}
+            {"☆".repeat(5 - Math.floor(rating))}{" "}
+          </div>{" "}
           <span className="text-sm text-gray-600">
-            {rating} ({totalReviews} reviews)
-          </span>
+            {" "}
+            {rating} ({totalReviews} reviews){" "}
+          </span>{" "}
         </div>
-
-        {/* 💰 PRICE */}
-        <div className="mt-4 flex items-center gap-3">
+        {/* PRICE */}
+        <motion.div
+          className="mt-4 flex items-center gap-3"
+          variants={{ hidden: { y: 20 }, show: { y: 0 } }}
+        >
           <span className="text-2xl font-bold">₹{product.discountPrice}</span>
           <span className="line-through text-gray-400">
             ₹{product.originalPrice}
@@ -121,23 +155,34 @@ const ProductDetails = () => {
           <span className="text-green-600 font-medium">
             {product.discount}% OFF
           </span>
-        </div>
-
-        {/* 📏 SIZES */}
+        </motion.div>
+        {/* STOCK WARNING */}
+        {product.quantity <= 2 && product.quantity > 0 && (
+          <motion.p
+            className="mt-2 text-red-600 font-semibold"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            Only {product.quantity} left in stock!
+          </motion.p>
+        )}
+        {/* 📏 SIZES */}{" "}
         {product.sizes && (
           <div className="mt-6">
-            <p className="font-semibold">Available Sizes</p>
+            {" "}
+            <p className="font-semibold">Available Sizes</p>{" "}
             <div className="flex gap-2 mt-2">
+              {" "}
               {product.sizes.split(",").map((size) => (
                 <span key={size} className="border px-4 py-1 rounded">
-                  {size}
+                  {" "}
+                  {size}{" "}
                 </span>
-              ))}
-            </div>
+              ))}{" "}
+            </div>{" "}
           </div>
         )}
-
-        {/* 🛒 QUANTITY */}
+        {/* QUANTITY */}
         <div className="mt-6">
           <p className="font-semibold mb-2">Quantity</p>
           <div className="flex items-center gap-4">
@@ -149,41 +194,95 @@ const ProductDetails = () => {
             </button>
             <span className="font-bold">{qty}</span>
             <button
-              onClick={() => setQty((q) => q + 1)}
+              onClick={() => setQty((q) => Math.min(product.quantity, q + 1))}
               className="px-3 py-1 border rounded"
             >
               +
             </button>
           </div>
         </div>
+        {/* ACTION BUTTONS */}
+        <div className="mt-6 flex gap-4">
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            disabled={product.quantity === 0}
+            onClick={() =>
+              dispatch(
+                addToCart({
+                  id: product.id,
+                  name: product.name,
+                  price: product.discountPrice,
+                  image: product.images?.[0]?.imageUrl,
+                  quantity: qty,
+                  description: product.description,
+                })
+              )
+            }
+            className="flex-1 py-2 rounded bg-blue-900 text-white"
+          >
+            Add to Cart
+          </motion.button>
 
-        {/* 🛍️ ADD TO CART */}
-        <button
-          disabled={product.quantity === 0}
-          onClick={(e) => {
-            e.stopPropagation();
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            className="flex-1 py-2 rounded bg-blue-900 text-white"
+          >
+            Checkout
+          </motion.button>
+        </div>
+        {/* 🚚 PRODUCT SERVICE INFO */}
+        <div className="mt-8 pt-6 pb-5">
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-4 text-center text-sm text-gray-700">
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-2xl"><ShieldCheck size={24} /></span>
+              <p className="font-medium">Pay on Delivery</p>
+            </div>
 
-            if (product.quantity === 0) return;
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-2xl"><RefreshCw size={24} /></span>
+              <p className="font-medium">10 Days Returnable</p>
+            </div>
 
-            dispatch(
-              addToCart({
-                id: product.id,
-                name: product.name,
-                price: product.discountedPrice,
-                quantity: product.quantity, // ✅ STOCK quantity
-              })
-            );
-          }}
-          className={`mt-4 w-full py-2 rounded ${
-            product.quantity > 0
-              ? "bg-black text-white"
-              : "bg-gray-300 cursor-not-allowed"
-          }`}
-        >
-          {product.quantity > 0 ? "Add to Cart" : "Out of Stock"}
-        </button>
-      </div>
-    </div>
+
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-2xl"><Truck size={24} /></span>
+              <p className="font-medium">Free Delivery</p>
+            </div>
+
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-2xl">
+                <CreditCard size={24} />
+              </span>
+              <p className="font-medium">Secure Transaction</p>
+            </div>
+          </div>
+        </div>
+        {/* VENDOR */}
+        {product.vendor && (
+          <div className="pb-10">
+          <motion.div
+            className="mt-6 p-4 bg-gray-50 border rounded-lg"
+            whileHover={{ y: -4 }}
+          >
+            <p className="font-semibold mb-2">Sold By</p>
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center font-bold">
+                {product.vendor.firstName[0]}
+              </div>
+              <div>
+                <p className="font-medium">{product.vendor.shopName}</p>
+                <p className="text-sm text-gray-600">
+                  {product.vendor.firstName} {product.vendor.lastName}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+          </div>
+        )}
+      </motion.div>
+    </motion.div>
   );
 };
 

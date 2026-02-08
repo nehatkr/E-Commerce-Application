@@ -115,8 +115,9 @@ const Products = () => {
                           addToCart({
                             id: product.id,
                             name: product.name,
-                            price: product.discountedPrice,
-                            quantity: product.quantity, // ✅ STOCK quantity
+                            price: product.discountPrice,
+                            image: product.images?.[0]?.imageUrl,
+                            description: product.description,
                           })
                         );
                       }}

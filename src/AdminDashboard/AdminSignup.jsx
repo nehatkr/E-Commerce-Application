@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-
 const AdminSignup = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -19,7 +18,7 @@ const AdminSignup = () => {
     gstNumber: "",
     password: "",
     confirmPassword: "",
-    role: "vendor"
+    role: "vendor",
   });
 
   const handleChange = (e) => {
@@ -30,54 +29,52 @@ const AdminSignup = () => {
     }));
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  if (formData.password !== formData.confirmPassword) {
-    alert("Passwords do not match");
-    return;
-  }
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
 
-  // ✅ Map frontend → backend payload
-  const payload = {
-    firstName: formData.firstName,
-    lastName: formData.lastName,
-    email: formData.email,
-    gender: formData.gender,
-    shopName: formData.shopName,
-    website: formData.website,
-    gstNumber: formData.gstNumber,
-    permanentAddress: formData.permanentAddress,
-    shopAddress: formData.shopAddress,
-    pinCode: Number(formData.pinCode),
-    phoneNo: Number(formData.phoneNo),
-    password: formData.password,
-    confirmPassword: formData.confirmPassword,
-    role: "vendor",
+    // ✅ Map frontend → backend payload
+    const payload = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      gender: formData.gender,
+      shopName: formData.shopName,
+      website: formData.website,
+      gstNumber: formData.gstNumber,
+      permanentAddress: formData.permanentAddress,
+      shopAddress: formData.shopAddress,
+      pinCode: Number(formData.pinCode),
+      phoneNo: Number(formData.phoneNo),
+      password: formData.password,
+      confirmPassword: formData.confirmPassword,
+      role: "vendor",
+    };
+
+    try {
+      const res = await axios.post(
+        "https://intern-app-ecommerce.onrender.com/api/vendors",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      alert("Vendor registered successfully 🎉");
+      navigate("/login");
+
+      console.log(res.data);
+    } catch (error) {
+      console.error("Signup error:", error.response?.data || error.message);
+      alert(error.response?.data?.message || "Signup failed");
+    }
   };
-
-  try {
-    const res = await axios.post(
-      "https://intern-app-ecommerce.onrender.com/api/vendors",
-      payload,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    alert("Vendor registered successfully 🎉");
-          navigate("/login");
-
-    console.log(res.data);
-
-  } catch (error) {
-    console.error("Signup error:", error.response?.data || error.message);
-    alert(error.response?.data?.message || "Signup failed");
-  }
-};
-
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10 mt-16">
@@ -91,43 +88,55 @@ const AdminSignup = () => {
         <div>
           <h3 className="font-semibold text-lg mb-4">Personal Details</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              name="firstName"
-              placeholder="First Name"
-              value={formData.firstName}
-              onChange={handleChange}
-              className="input p-2"
-              required
-            />
-            <input
-              name="lastName"
-              placeholder="Last Name"
-              value={formData.lastName}
-              onChange={handleChange}
-              className="input p-2"
-              required
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-              className="input p-2"
-              required
-            />
-            <select
-              name="gender"
-              value={formData.gender}
-              onChange={handleChange}
-              className="input p-2"
-              required
-            >
-              <option value="">Select Gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
+            <div className="block text-sm font-medium text-gray-700">
+              <label className="floating-label">First Name*</label>
+              <input
+                name="firstName"
+                placeholder="First Name"
+                value={formData.firstName}
+                onChange={handleChange}
+                className="mt-1  w-full px-3 py-2  "
+                required
+              />
+            </div>
+            <div className="block text-sm font-medium text-gray-700">
+              <label className="floating-label">Last Name*</label>
+              <input
+                name="lastName"
+                placeholder="Last Name"
+                value={formData.lastName}
+                onChange={handleChange}
+                className="mt-1  w-full px-3 py-2  "
+                required
+              />
+            </div>
+            <div className="block text-sm font-medium text-gray-700">
+              <label className="floating-label">Email Id*</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+                className="mt-1  w-full px-3 py-2 "
+                required
+              />
+            </div>
+            <div className="block text-sm font-medium text-gray-700">
+              <label className="floating-label">Gender*</label>
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                className="mt-1  w-full px-3 py-2  "
+                required
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -135,29 +144,39 @@ const AdminSignup = () => {
         <div>
           <h3 className="font-semibold text-lg mb-4 mt-4">Business Details</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              name="shopName"
-              placeholder="Shop Name"
-              value={formData.shopName}
-              onChange={handleChange}
-              className="input p-2"
-              required
-            />
-            <input
-              name="website"
-              placeholder="Website (optional)"
-              value={formData.website}
-              onChange={handleChange}
-              className="input p-2"
-            />
-            <input
-              name="gstNumber"
-              placeholder="GST Number"
-              value={formData.gstNumber}
-              onChange={handleChange}
-              className="input p-2"
-              required
-            />
+            <div className="block text-sm font-medium text-gray-700">
+              <label className="floating-label">Shop Name*</label>
+              <input
+                name="shopName"
+                placeholder="Shop Name"
+                value={formData.shopName}
+                onChange={handleChange}
+                className="mt-1  w-full px-3 py-2 "
+                required
+              />
+            </div>
+            <div className="block text-sm font-medium text-gray-700">
+              <label className="floating-label">Website url*</label>
+              <input
+                type="url"
+                name="website"
+                placeholder="Website (optional)"
+                value={formData.website}
+                onChange={handleChange}
+                className="mt-1  w-full px-3 py-2  "
+              />
+            </div>
+            <div className="block text-sm font-medium text-gray-700">
+              <label className="floating-label">GST NO.*</label>
+              <input
+                name="gstNumber"
+                placeholder="GST Number"
+                value={formData.gstNumber}
+                onChange={handleChange}
+                className="mt-1  w-full px-3 py-2 "
+                required
+              />
+            </div>
           </div>
         </div>
 
@@ -165,44 +184,54 @@ const AdminSignup = () => {
         <div>
           <h3 className="font-semibold text-lg mb-4">Address</h3>
           <div className="grid grid-cols-1 gap-4">
-            <textarea
-              name="permanentAddress"
-              placeholder="Permanent Address"
-              value={formData.permanentAddress}
-              onChange={handleChange}
-              className="input p-2"
-              rows={2}
-              required
-            />
-            <textarea
-              name="shopAddress"
-              placeholder="Shop Address"
-              value={formData.shopAddress}
-              onChange={handleChange}
-              className="input p-2"
-              rows={2}
-              required
-            />
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-  <input
-              name="pinCode"
-              placeholder="Pin Code"
-              value={formData.pinCode}
-              onChange={handleChange}
-              className="input p-2"
-              required
-            />
-            <input
-              name="phoneNo"
-              placeholder="Mobile"
-              value={formData.phoneNo}
-              onChange={handleChange}
-              className="input p-2"
-              required
-            />
-
-             </div>
-          
+            <div className="block text-sm font-medium text-gray-700">
+              <label className="floating-label">Permanent Address*</label>
+              <textarea
+                name="permanentAddress"
+                placeholder="Permanent Address"
+                value={formData.permanentAddress}
+                onChange={handleChange}
+                className="mt-1  w-full px-3 py-2 "
+                rows={2}
+                required
+              />
+            </div>
+            <div className="block text-sm font-medium text-gray-700">
+              <label className="floating-label">Shop Address*</label>
+              <textarea
+                name="shopAddress"
+                placeholder="Shop Address"
+                value={formData.shopAddress}
+                onChange={handleChange}
+                className="mt-1  w-full px-3 py-2"
+                rows={2}
+                required
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="block text-sm font-medium text-gray-700">
+                <label className="floating-label">Pin Code*</label>
+                <input
+                  name="pinCode"
+                  placeholder="Pin Code"
+                  value={formData.pinCode}
+                  onChange={handleChange}
+                  className="mt-1  w-full px-3 py-2 "
+                  required
+                />
+              </div>
+              <div className="block text-sm font-medium text-gray-700">
+                <label className="floating-label">Phone Number*</label>
+                <input
+                  name="phoneNo"
+                  placeholder="Mobile"
+                  value={formData.phoneNo}
+                  onChange={handleChange}
+                  className="mt-1  w-full px-3 py-2 boder "
+                  required
+                />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -210,24 +239,30 @@ const AdminSignup = () => {
         <div>
           <h3 className="font-semibold text-lg mb-4">Security</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-              className="input p-2"
-              required
-            />
-            <input
-              type="password"
-              name="confirmPassword"
-              placeholder="Confirm Password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className="input p-2"
-              required
-            />
+            <div className="block text-sm font-medium text-gray-700">
+              <label className="floating-label">Password*</label>
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+                className="mt-1  w-full px-3 py-2 "
+                required
+              />
+            </div>{" "}
+            <div className="block text-sm font-medium text-gray-700">
+              <label className="floating-label">Confirm Password*</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                placeholder="Confirm Password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="mt-1  w-full px-3 py-2  "
+                required
+              />
+            </div>
           </div>
         </div>
 
