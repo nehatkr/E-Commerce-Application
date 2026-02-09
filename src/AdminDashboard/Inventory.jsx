@@ -237,7 +237,7 @@ const Inventory = () => {
 
         <button
           type="submit"
-          className="w-full bg-gray-900 text-white py-3 rounded hover:bg-gray-800 font-bold"
+          className="w-full bg-blue-900 text-white py-3 rounded hover:bg-blue-800 font-bold"
         >
           Add Product
         </button>

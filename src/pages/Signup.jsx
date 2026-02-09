@@ -248,7 +248,7 @@ const Signup = () => {
             className={`w-full py-3 rounded font-bold transition ${
               loading
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-gray-900 text-white hover:bg-gray-800"
+                : "bg-blue-900 text-white hover:bg-blue-800"
             }`}
           >
             {loading ? "Creating Account..." : "Sign Up"}

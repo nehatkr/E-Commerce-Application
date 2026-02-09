@@ -269,7 +269,7 @@ const AdminSignup = () => {
         {/* SUBMIT */}
         <button
           type="submit"
-          className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition transform transition-transform duration-75 active:scale-95"
+          className="w-full bg-blue-900 text-white py-3 rounded-lg hover:bg-blue-800 transition transform transition-transform duration-75 active:scale-95"
         >
           Register as Vendor
         </button>

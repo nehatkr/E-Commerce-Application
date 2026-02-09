@@ -7,7 +7,6 @@ import {
 } from "../redux/cartSlice";
 import { User } from "lucide-react";
 
-const BASE_URL = "https://intern-app-ecommerce-production.up.railway.app";
 
 const CartPage = () => {
   const dispatch = useDispatch();

@@ -123,7 +123,7 @@ const Products = () => {
                       }}
                       className={`mt-4 w-full py-2 rounded ${
                         product.quantity > 0
-                          ? "bg-black text-white"
+                          ? "bg-blue-900 text-white hover:bg-blue-800"
                           : "bg-gray-300 cursor-not-allowed"
                       }`}
                     >
@@ -140,7 +140,7 @@ const Products = () => {
         <div className="flex justify-center mt-10">
           <button
             onClick={() => setPage((p) => p + 1)}
-            className="px-6 py-3 bg-black text-white rounded"
+            className="px-6 py-3 bg-blue-900 text-white rounded hover:bg-blue-800"
           >
             Load More
           </button>

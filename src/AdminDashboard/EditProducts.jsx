@@ -108,6 +108,31 @@ const startEdit = (product) => {
     }
   };
 
+  const deleteProduct = async (id) => {
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this product?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    const res = await fetch(`${BASE_URL}/api/product/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to delete product");
+    }
+
+    // ✅ Refresh product list after delete
+    dispatch(fetchVendorProducts(vendorId));
+  } catch (error) {
+    console.error(error);
+    alert("Failed to delete product");
+  }
+};
+
+
   if (loading) {
     return <p className="text-center mt-20 text-lg">Loading Products...</p>;
   }
@@ -253,7 +278,7 @@ const startEdit = (product) => {
                           Edit
                         </button>
                         <button
-                          // onClick={() => deleteProduct(product.id)}
+                           onClick={() => deleteProduct(product.id)}
                           className="bg-red-600 text-white px-3 py-1 rounded"
                         >
                           Delete

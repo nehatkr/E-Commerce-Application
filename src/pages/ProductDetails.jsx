@@ -219,7 +219,7 @@ const ProductDetails = () => {
                 })
               )
             }
-            className="flex-1 py-2 rounded bg-blue-900 text-white"
+            className="flex-1 py-2 rounded bg-blue-900 text-white hover:bg-blue-800"
           >
             Add to Cart
           </motion.button>
@@ -227,7 +227,7 @@ const ProductDetails = () => {
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
-            className="flex-1 py-2 rounded bg-blue-900 text-white"
+            className="flex-1 py-2 rounded bg-blue-900 text-white hover:bg-blue-800"
           >
             Checkout
           </motion.button>
