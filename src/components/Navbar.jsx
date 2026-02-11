@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ShoppingCart, User, Menu, X, Package } from "lucide-react";
 import { logout } from "../redux/authSlice";
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isLoginPage = location.pathname === "/login";
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const { isLoggedIn, user } = useSelector((state) => state.auth);
   const cartItems = useSelector((state) => state.cart.items);
@@ -17,8 +20,9 @@ const Navbar = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate("/login");
+    setIsProfileOpen(false);
     setIsMenuOpen(false);
+    navigate("/login");
   };
 
   return (
@@ -27,7 +31,6 @@ const Navbar = () => {
       <nav className="bg-white shadow-md fixed top-0 w-full z-40">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between h-16 items-center">
-
             {/* LEFT */}
             <div className="flex items-center gap-4">
               {isLoggedIn && (
@@ -66,20 +69,59 @@ const Navbar = () => {
                   </button>
 
                   {/* USER */}
-                  <div className="flex items-center gap-2">
-                    <User size={22} />
-                    <span className="hidden md:block">
-                      {user?.firstName}
-                    </span>
-                  </div>
+                  {role === "user" && (
+                    <div className="relative">
+                      <button
+                        onClick={() => setIsProfileOpen(!isProfileOpen)}
+                        className="flex items-center gap-2 hover:bg-gray-200 px-3 py-1.5 rounded-full transition"
+                      >
+                        <User size={20} />
+                        <span className="text-sm font-medium">
+                          {user?.firstName}
+                        </span>
+                      </button>
+
+                      {isProfileOpen && (
+                        <div className="absolute left-0 mt-3 w-52 bg-black rounded-xl shadow-xl border border-white overflow-hidden animate-fade-in">
+                          {/* Header */}
+                          <div className="px-4 py-3 bg-gray-150 flex items-center gap-2">
+                            <User size={18} className="text-white" />
+                            <p className="text-sm font-semibold text-white">
+                             {user?.firstName}
+                            </p>
+                          </div>
+
+                          <div className="border-t">
+                            <Link
+                              to="/my-orders"
+                              onClick={() => setIsProfileOpen(false)}
+                              className="flex items-center gap-3 px-4 py-3 text-sm text-white hover:bg-gray-900 transition"
+                            >
+                              🛒 My Orders
+                            </Link>
+
+                            <Link
+                              to="/profile"
+                              onClick={() => setIsProfileOpen(false)}
+                              className="flex items-center gap-3 px-4 py-3 text-sm text-white hover:bg-gray-900 transition"
+                            >
+                              👤 My Profile
+                            </Link>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </>
               ) : (
-                <Link
-                  to="/login"
-                  className="px-4 py-2 bg-black text-white rounded"
-                >
-                  Sign In
-                </Link>
+                !isLoginPage && (
+                  <Link
+                    to="/login"
+                    className="px-4 py-2 bg-black text-white rounded"
+                  >
+                    Sign In
+                  </Link>
+                )
               )}
             </div>
           </div>
@@ -116,10 +158,7 @@ const Navbar = () => {
                   {/* USER MENU */}
                   {role === "user" && (
                     <li>
-                      <Link
-                        to="/products"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
+                      <Link to="/products" onClick={() => setIsMenuOpen(false)}>
                         Shop
                       </Link>
                     </li>
