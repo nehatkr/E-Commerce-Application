@@ -3,44 +3,42 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchVendorProducts } from "../redux/vendorProductsSlice";
 import { removeProduct } from "../redux/vendorProductsSlice";
 
-
 const BASE_URL = "https://intern-app-ecommerce.onrender.com";
 
 const EditProducts = () => {
   const dispatch = useDispatch();
 
-  const { items: products, loading } = useSelector((state) => state.products);
+  const { items: products, loading } = useSelector(
+    (state) => state.vendorProducts,
+  );
 
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({});
 
   const { user } = useSelector((state) => state.auth);
-const vendorId = user?.id;
-
+  const vendorId = user?.id;
 
   // ✅ FETCH PRODUCTS (VERY IMPORTANT)
-useEffect(() => {
-  if (vendorId) {
-    dispatch(fetchVendorProducts(vendorId));
-  }
-}, [dispatch, vendorId]);
+  useEffect(() => {
+    if (vendorId) {
+      dispatch(fetchVendorProducts(vendorId));
+    }
+  }, [dispatch, vendorId]);
 
-
-const startEdit = (product) => {
-  setEditingId(product.id);
-  setForm({
-    name: product.name || "",
-    category: product.category || "Men",
-    price: product.price ?? 0,
-    discountPercentage: product.discountPercentage ?? 0,
-    discountedPrice: product.discountedPrice ?? 0,
-    quantity: product.quantity ?? 0,
-    sizes: product.sizes?.join(", ") || "",
-    description: product.description || "",
-    addToCartEnabled: product.quantity > 0,
-  });
-};
-
+  const startEdit = (product) => {
+    setEditingId(product.id);
+    setForm({
+      name: product.name || "",
+      category: product.category || "Men",
+      price: product.price ?? 0,
+      discountPercentage: product.discountPercentage ?? 0,
+      discountedPrice: product.discountedPrice ?? 0,
+      quantity: product.quantity ?? 0,
+      sizes: product.sizes?.join(", ") || "",
+      description: product.description || "",
+      addToCartEnabled: product.quantity > 0,
+    });
+  };
 
   useEffect(() => {
     if (form.price && form.discountPercentage) {
@@ -78,7 +76,7 @@ const startEdit = (product) => {
       formData.append("description", form.description || "");
       formData.append(
         "addToCartEnabled",
-        form.addToCartEnabled ? "true" : "false"
+        form.addToCartEnabled ? "true" : "false",
       );
 
       // sizes → backend accepts comma separated OR repeated key
@@ -101,7 +99,7 @@ const startEdit = (product) => {
 
       if (!res.ok) throw new Error("Update failed");
 
-     dispatch(fetchVendorProducts(vendorId));
+      dispatch(fetchVendorProducts(vendorId));
 
       setEditingId(null);
     } catch (err) {
@@ -111,31 +109,30 @@ const startEdit = (product) => {
   };
 
   const deleteProduct = async (id) => {
-  const confirmDelete = window.confirm(
-    "Are you sure you want to delete this product?"
-  );
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this product?",
+    );
 
-  if (!confirmDelete) return;
+    if (!confirmDelete) return;
 
-  try {
-    const res = await fetch(`${BASE_URL}/api/product/${id}`, {
-      method: "DELETE",
-    });
+    try {
+      const res = await fetch(`${BASE_URL}/api/product/${id}`, {
+        method: "DELETE",
+      });
 
-    if (!res.ok) {
-      throw new Error("Failed to delete product");
+      if (!res.ok) {
+        throw new Error("Failed to delete product");
+      }
+
+      dispatch(removeProduct(id));
+
+      // ✅ Refresh product list after delete
+      dispatch(fetchVendorProducts(vendorId));
+    } catch (error) {
+      console.error(error);
+      alert("Failed to delete product");
     }
-
-        dispatch(removeProduct(id));
-
-    // ✅ Refresh product list after delete
-    dispatch(fetchVendorProducts(vendorId));
-  } catch (error) {
-    console.error(error);
-    alert("Failed to delete product");
-  }
-};
-
+  };
 
   if (loading) {
     return <p className="text-center mt-20 text-lg">Loading Products...</p>;
@@ -282,7 +279,7 @@ const startEdit = (product) => {
                           Edit
                         </button>
                         <button
-                           onClick={() => deleteProduct(product.id)}
+                          onClick={() => deleteProduct(product.id)}
                           className="bg-red-600 text-white px-3 py-1 rounded"
                         >
                           Delete
@@ -297,7 +294,7 @@ const startEdit = (product) => {
         </table>
       </div>
 
-      {products.length === 0 && (
+      {Array.isArray(products) && products.length === 0 && (
         <p className="text-center text-gray-500 mt-10">
           No products available.
         </p>

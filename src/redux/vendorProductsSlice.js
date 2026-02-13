@@ -63,7 +63,7 @@ const productSlice = createSlice({
       .addCase(fetchVendorProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-        state.items = action.payload; // IMPORTANT
+       state.items = []; 
       });
   },
 });
