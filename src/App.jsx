@@ -18,6 +18,8 @@ import AdminSignup from "./AdminDashboard/AdminSignup";
 import EditProducts from "./AdminDashboard/EditProducts"; // Admin edit page
 import VendorDashboard from "./AdminDashboard/Dashboard";
 import CartPage from "./pages/CartPage";
+import MyProfile from "./pages/MyProfile";
+import MyOrders from "./pages/myOrders";
 
 // 🔐 Protected Route (User login check)
 const ProtectedRoute = ({ children }) => {
@@ -82,6 +84,13 @@ function App() {
                 </VendorRoute>
               }
             />
+            <Route
+              path="/myOrders"
+              element={
+                  <MyOrders />
+                
+              }
+            />
 
             {/* ================= PROTECTED USER ROUTES ================= */}
             <Route
@@ -101,6 +110,8 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            <Route path="/profile" element={<MyProfile />} />
 
             <Route
               path="/products"

@@ -87,13 +87,13 @@ const Navbar = () => {
                           <div className="px-4 py-3 bg-gray-150 flex items-center gap-2">
                             <User size={18} className="text-white" />
                             <p className="text-sm font-semibold text-white">
-                             {user?.firstName}
+                              {user?.firstName}
                             </p>
                           </div>
 
                           <div className="border-t">
                             <Link
-                              to="/my-orders"
+                              to="/myOrders"
                               onClick={() => setIsProfileOpen(false)}
                               className="flex items-center gap-3 px-4 py-3 text-sm text-white hover:bg-gray-900 transition"
                             >
@@ -107,6 +107,63 @@ const Navbar = () => {
                             >
                               👤 My Profile
                             </Link>
+                            <button
+                              onClick={() => {
+                                dispatch(logout());
+                                setIsProfileOpen(false);
+                                navigate("/login");
+                              }}
+                              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-gray-800 transition"
+                            >
+                              🚪 Logout
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* vendor */}
+                  {role === "vendor" && (
+                    <div className="relative">
+                      <button
+                        onClick={() => setIsProfileOpen(!isProfileOpen)}
+                        className="flex items-center gap-2 hover:bg-gray-200 px-3 py-1.5 rounded-full transition"
+                      >
+                        <User size={20} />
+                        <span className="text-sm font-medium">
+                          {user?.firstName}
+                        </span>
+                      </button>
+
+                      {isProfileOpen && (
+                        <div className="absolute left-0 mt-3 w-52 bg-black rounded-xl shadow-xl border border-white overflow-hidden animate-fade-in">
+                          {/* Header */}
+                          <div className="px-4 py-3 bg-gray-150 flex items-center gap-2">
+                            <User size={18} className="text-white" />
+                            <p className="text-sm font-semibold text-white">
+                              {user?.firstName}
+                            </p>
+                          </div>
+
+                          <div className="border-t">
+                            <Link
+                              to="/profile"
+                              onClick={() => setIsProfileOpen(false)}
+                              className="flex items-center gap-3 px-4 py-3 text-sm text-white hover:bg-gray-900 transition"
+                            >
+                              👤 My Profile
+                            </Link>
+                            <button
+                              onClick={() => {
+                                dispatch(logout());
+                                setIsProfileOpen(false);
+                                navigate("/login");
+                              }}
+                              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-gray-800 transition"
+                            >
+                              🚪 Logout
+                            </button>
                           </div>
                         </div>
                       )}

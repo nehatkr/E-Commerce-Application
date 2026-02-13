@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchVendorProducts } from "../redux/vendorProductsSlice";
+import { removeProduct } from "../redux/vendorProductsSlice";
+
 
 const BASE_URL = "https://intern-app-ecommerce.onrender.com";
 
@@ -123,6 +125,8 @@ const startEdit = (product) => {
     if (!res.ok) {
       throw new Error("Failed to delete product");
     }
+
+        dispatch(removeProduct(id));
 
     // ✅ Refresh product list after delete
     dispatch(fetchVendorProducts(vendorId));

@@ -8,13 +8,13 @@ export const fetchVendorProducts = createAsyncThunk(
   async (vendorId, { rejectWithValue }) => {
     try {
       const res = await axios.get(
-        `${BASE_URL}/api/product/vendor/${vendorId}` // ✅ correct endpoint
+        `${BASE_URL}/api/product/vendor/${vendorId}`, // ✅ correct endpoint
       );
       return res.data; // ✅ axios way
     } catch (err) {
       return rejectWithValue(err.response?.data || "Failed to fetch products");
     }
-  }
+  },
 );
 
 const productSlice = createSlice({
@@ -24,7 +24,13 @@ const productSlice = createSlice({
     loading: false,
     error: null,
   },
-  reducers: {},
+   reducers: {
+    removeProduct: (state, action) => {
+      state.items = state.items.filter(
+        (product) => product.id !== action.payload
+      );
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchVendorProducts.pending, (state) => {
@@ -57,8 +63,10 @@ const productSlice = createSlice({
       .addCase(fetchVendorProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.items = action.payload; // IMPORTANT
       });
   },
 });
 
+export const { removeProduct } = productSlice.actions;
 export default productSlice.reducer;
