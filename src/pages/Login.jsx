@@ -38,7 +38,7 @@ const handleLogin = async (e) => {
     if (normalizedUser.role === "vendor") {
       navigate("/inventory");
     } else {
-      navigate("/");
+      navigate("/products");
     }
 
   } catch (err) {
