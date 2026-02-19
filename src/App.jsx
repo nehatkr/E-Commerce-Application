@@ -20,6 +20,7 @@ import VendorDashboard from "./AdminDashboard/Dashboard";
 import CartPage from "./pages/CartPage";
 import MyProfile from "./pages/MyProfile";
 import MyOrders from "./pages/myOrders";
+import MainLayout from "./style/MainLayout";
 
 // 🔐 Protected Route (User login check)
 const ProtectedRoute = ({ children }) => {
@@ -63,7 +64,9 @@ function App() {
               path="/inventory"
               element={
                 <VendorRoute>
+                  <MainLayout>
                   <Inventory />
+                  </MainLayout>
                 </VendorRoute>
               }
             />
@@ -71,7 +74,9 @@ function App() {
               path="/vendor/dashboard"
               element={
                 <ProtectedRoute>
+                  <MainLayout>
                   <VendorDashboard />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -80,7 +85,9 @@ function App() {
               path="/admin/edit-products"
               element={
                 <VendorRoute>
+                  <MainLayout>
                   <EditProducts />
+                  </MainLayout>
                 </VendorRoute>
               }
             />
@@ -97,7 +104,9 @@ function App() {
               path="/inventory"
               element={
                 <ProtectedRoute>
+                  <MainLayout>
                   <Inventory />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -106,7 +115,9 @@ function App() {
               path="/cart"
               element={
                 <ProtectedRoute>
+                  <MainLayout>
                   <CartPage />
+                </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -117,7 +128,9 @@ function App() {
               path="/products"
               element={
                 <ProtectedRoute>
+                  <MainLayout>
                   <Products />
+                </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -126,7 +139,9 @@ function App() {
               path="/products/:id"
               element={
                 <ProtectedRoute>
+                  <MainLayout>
                   <ProductDetails />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -136,7 +151,9 @@ function App() {
               path="/admin/edit-products"
               element={
                 <ProtectedRoute>
+                  <MainLayout>
                   <EditProducts />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />

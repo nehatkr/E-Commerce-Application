@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchVendorProducts } from "../redux/vendorProductsSlice";
 import { removeProduct } from "../redux/vendorProductsSlice";
+import { BASE_URL } from "../utils/constants";
 
-const BASE_URL = "https://intern-app-ecommerce.onrender.com";
+
 
 const EditProducts = () => {
   const dispatch = useDispatch();

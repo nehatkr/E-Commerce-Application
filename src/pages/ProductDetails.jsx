@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../redux/cartSlice";
+import { BASE_URL } from "../utils/constants";
 import {
   Truck,
   RefreshCw,
@@ -25,7 +26,6 @@ const ProductDetails = () => {
   const rating = 4.3;
   const totalReviews = 128;
 
-  const BASE_URL = "https://intern-app-ecommerce.onrender.com";
 
   const getImageUrl = (url) => {
     if (!url) return "/placeholder.png";
@@ -36,7 +36,7 @@ const ProductDetails = () => {
     const fetchProduct = async () => {
       try {
         const res = await axios.get(
-          `https://intern-app-ecommerce.onrender.com/api/product/${id}`
+          `${BASE_URL}/api/product/${id}`
         );
         setProduct(res.data);
         setActiveImage(getImageUrl(res.data.images?.[0]?.imageUrl));

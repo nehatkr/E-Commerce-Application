@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { BASE_URL } from "../utils/constants";
 
-const BASE_URL = "https://intern-app-ecommerce.onrender.com";
+
 
 export const fetchVendorProducts = createAsyncThunk(
   "products/fetchVendorProducts",

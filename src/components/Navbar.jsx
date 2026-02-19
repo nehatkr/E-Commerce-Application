@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ShoppingCart, User, Menu, X, Package } from "lucide-react";
 import { logout } from "../redux/authSlice";
+import { FiHome, FiEdit, FiLogOut, FiGrid, FiBox } from "react-icons/fi";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -17,6 +18,17 @@ const Navbar = () => {
   const role = user?.role?.toLowerCase();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isManualOpen, setIsManualOpen] = useState(false);
+
+  useEffect(() => {
+    if (location.pathname === "/") {
+      setIsMenuOpen(false); // Home → closed
+      setIsManualOpen(false);
+    } else {
+      setIsMenuOpen(true); // Other pages → open
+      setIsManualOpen(false); // 👈 key fix
+    }
+  }, [location.pathname]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -33,8 +45,13 @@ const Navbar = () => {
           <div className="flex justify-between h-16 items-center">
             {/* LEFT */}
             <div className="flex items-center gap-4">
-              {isLoggedIn && (
-                <button onClick={() => setIsMenuOpen(true)}>
+              {isLoggedIn && location.pathname !== "/" && (
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(true);
+                    setIsManualOpen(true);
+                  }}
+                >
                   <Menu size={24} />
                 </button>
               )}
@@ -186,108 +203,69 @@ const Navbar = () => {
       </nav>
 
       {/* MOBILE SIDEBAR */}
-      {isMenuOpen && (
-        <div className="fixed inset-0 z-50 flex">
-          {/* Overlay */}
-          <div
-            className="absolute inset-0 bg-black bg-opacity-50"
-            onClick={() => setIsMenuOpen(false)}
-          />
+      {/* SIDEBAR */}
+      {isMenuOpen &&
+        location.pathname !== "/" &&
+        location.pathname !== "/login" &&
+        location.pathname !== "/signup" &&
+        location.pathname !== "/admin/signup" && (
+          <aside className="fixed left-0 top-16 w-60 min-h-screen bg-white shadow-sm z-20">
+            <div className="p-6 space-y-6 font-medium">
+              <ul className="space-y-10 font-bold ">
+                <li className="hover:text-gray-500 ">
+                  <Link to="/">
+                    <span className="flex items-center gap-2 ">
+                      <FiEdit className="text-xl" />
+                      Home
+                    </span>
+                  </Link>
+                </li>
 
-          {/* Sidebar */}
-          <div className="relative z-50 bg-white w-64 h-full p-4 shadow-xl">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold">Menu</h2>
-              <button onClick={() => setIsMenuOpen(false)}>
-                <X />
-              </button>
-            </div>
-
-            <ul className="space-y-6 font-bold">
-              <li>
-                <Link to="/" onClick={() => setIsMenuOpen(false)}>
-                  Home
-                </Link>
-              </li>
-
-              {isLoggedIn ? (
-                <>
-                  {/* USER MENU */}
-                  {role === "user" && (
-                    <li>
-                      <Link to="/products" onClick={() => setIsMenuOpen(false)}>
-                        Shop
+                {role === "vendor" && (
+                  <>
+                    <li className="hover:text-gray-500">
+                      <Link to="/vendor/dashboard">
+                        {" "}
+                        <span className="flex items-center gap-2">
+                          <FiGrid className="text-xl" />
+                          Dashboard
+                        </span>
                       </Link>
                     </li>
-                  )}
-
-                  {/* VENDOR MENU */}
-                  {role === "vendor" && (
-                    <>
-                      <li>
-                        <Link
-                          to="/vendor/dashboard"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          Dashboard
-                        </Link>
-                      </li>
-
-                      <li>
-                        <Link
-                          to="/inventory"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
+                    <li className="hover:text-gray-500">
+                      <Link to="/inventory">
+                        <span className="flex items-center gap-2">
+                          <FiBox size={26} className="text-xl" />
                           Inventory Management
-                        </Link>
-                      </li>
-
-                      <li>
-                        <Link
-                          to="/admin/edit-products"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
+                        </span>
+                      </Link>
+                    </li>
+                    <li className="hover:text-gray-500">
+                      <Link to="/admin/edit-products">
+                        <span className="flex items-center gap-2">
+                          <FiEdit className="text-xl" />
                           Edit Products
-                        </Link>
-                      </li>
-                    </>
-                  )}
+                        </span>
+                      </Link>
+                    </li>
+                  </>
+                )}
 
-                  <li>
-                    <button
-                      onClick={handleLogout}
-                      className="text-red-600 hover:text-red-400"
-                    >
+                <li>
+                  <button
+                    onClick={handleLogout}
+                    className="text-red-600 hover:text-red-400"
+                  >
+                    <span className="flex items-center gap-2">
+                      <FiLogOut size={25} />
                       Logout
-                    </button>
-                  </li>
-                </>
-              ) : (
-                <>
-                  <li>
-                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                      Sign In
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
-                      Sign Up
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/admin/signup"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Vendor Sign Up
-                    </Link>
-                  </li>
-                </>
-              )}
-            </ul>
-          </div>
-        </div>
-      )}
+                    </span>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </aside>
+        )}
     </>
   );
 };

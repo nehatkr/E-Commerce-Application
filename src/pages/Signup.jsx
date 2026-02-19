@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { login } from "../redux/authSlice";
+import { BASE_URL } from "../utils/constants";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -72,7 +73,7 @@ const Signup = () => {
       console.log("Signup Payload: ", payload);
 
       await axios.post(
-        "https://intern-app-ecommerce.onrender.com/api/users",
+        `${BASE_URL}/api/users`,
         payload,
         {
           headers: {
@@ -128,7 +129,6 @@ const Signup = () => {
                 placeholder="Enter Middle Name "
                 onChange={handleChange}
                 className="input-field"
-                required
               />
             </div>
           </div>
@@ -218,7 +218,7 @@ const Signup = () => {
           <span className="text-red-500 text-xs">{errors.phone}</span>
 
           <div className="block text-sm font-medium text-gray-700">
-            <label className="floating-label">Address L1 *</label>
+            <label className="floating-label">Password*</label>
             <input
               type="password"
               name="password"
@@ -229,7 +229,7 @@ const Signup = () => {
             />
           </div>
             <div className="block text-sm font-medium text-gray-700">
-            <label className="floating-label">Address L1 *</label>
+            <label className="floating-label">Confirm Password*</label>
           <input
             type="password"
             name="confirmPassword"
