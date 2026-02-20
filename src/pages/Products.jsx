@@ -111,15 +111,7 @@ const Products = () => {
 
                         if (product.quantity === 0) return;
 
-                        dispatch(
-                          addToCart({
-                            id: product.id,
-                            name: product.name,
-                            price: product.discountPrice,
-                            image: product.images?.[0]?.imageUrl,
-                            description: product.description,
-                          })
-                        );
+                       dispatch(addToCart(product));
                       }}
                       className={`mt-4 w-full py-2 rounded ${
                         product.quantity > 0

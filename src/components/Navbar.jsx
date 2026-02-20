@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ShoppingCart, User, Menu, X, Package } from "lucide-react";
 import { logout } from "../redux/authSlice";
-import { FiHome, FiEdit, FiLogOut, FiGrid, FiBox } from "react-icons/fi";
+import { FiHome, FiEdit, FiLogOut, FiGrid, FiBox, FiShoppingCart } from "react-icons/fi";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -217,6 +217,15 @@ const Navbar = () => {
                     <span className="flex items-center gap-2 ">
                       <FiEdit className="text-xl" />
                       Home
+                    </span>
+                  </Link>
+                </li>
+                <li className="hover:text-gray-500 ">
+                  <Link
+                    to="/myOrders">
+                      <span className="flex items-center gap-2 ">
+                      <FiShoppingCart className="text-xl" />
+                      My Orders
                     </span>
                   </Link>
                 </li>

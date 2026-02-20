@@ -1,10 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  removeFromCart,
-  increaseQty,
-  decreaseQty,
-} from "../redux/cartSlice";
+import { removeFromCart, increaseQty, decreaseQty } from "../redux/cartSlice";
 import { User } from "lucide-react";
 
 const CartPage = () => {
@@ -15,15 +11,13 @@ const CartPage = () => {
 
   // ✅ TOTAL AMOUNT
   const totalAmount = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
+    (sum, item) => sum + Number(item.price) * Number(item.quantity),
+    0,
   );
 
   // ✅ TOTAL ITEMS (FIXED)
-  const totalItems = items.reduce(
-    (sum, item) => sum + item.quantity,
-    0
-  );
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  console.log(items);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 mt-20">
@@ -44,10 +38,6 @@ const CartPage = () => {
           ) : (
             items.map((item) => {
               // ✅ IMAGE FIX (VERY IMPORTANT)
-              const imageUrl =
-                item.images && item.images.length > 0
-                  ? item.images[0].imageUrl
-                  : "https://via.placeholder.com/100";
 
               return (
                 <div
@@ -56,21 +46,19 @@ const CartPage = () => {
                 >
                   {/* IMAGE */}
                   <img
-                    src={imageUrl}
+                    src={item.images?.[0]?.imageUrl || "/logo.png"}
                     alt={item.name}
                     className="w-24 h-24 object-cover rounded-lg border"
                     onError={(e) => {
-                      e.currentTarget.src =
-                        "https://via.placeholder.com/100";
+                      e.currentTarget.onerror = null; // 🔴 IMPORTANT: prevents infinite loop
+                      e.currentTarget.src = "/no-image.png";
                     }}
                   />
 
                   {/* DETAILS */}
                   <div className="flex-1">
                     <h3 className="font-semibold">{item.name}</h3>
-                    <p className="text-sm text-gray-500">
-                      {item.description}
-                    </p>
+                    <p className="text-sm text-gray-500">{item.description}</p>
 
                     <p className="font-bold mt-2">₹{item.price}</p>
 
@@ -83,9 +71,7 @@ const CartPage = () => {
                         −
                       </button>
 
-                      <span className="font-semibold">
-                        {item.quantity}
-                      </span>
+                      <span className="font-semibold">{item.quantity}</span>
 
                       <button
                         onClick={() => dispatch(increaseQty(item.id))}
@@ -111,9 +97,7 @@ const CartPage = () => {
 
         {/* SUMMARY */}
         <div className="bg-white p-6 rounded-xl shadow h-fit">
-          <h3 className="text-lg font-semibold mb-4">
-            Order Summary
-          </h3>
+          <h3 className="text-lg font-semibold mb-4">Order Summary</h3>
 
           <div className="flex justify-between mb-2">
             <span>Total Items</span>
@@ -122,7 +106,7 @@ const CartPage = () => {
 
           <div className="flex justify-between font-bold text-lg">
             <span>Total</span>
-            <span>₹{totalAmount.toFixed(2)}</span>
+            <span>₹{totalAmount}</span>
           </div>
 
           <button className="mt-6 w-full bg-black text-white py-2 rounded-lg">
