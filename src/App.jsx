@@ -21,6 +21,7 @@ import CartPage from "./pages/CartPage";
 import MyProfile from "./pages/MyProfile";
 import MyOrders from "./pages/myOrders";
 import MainLayout from "./style/MainLayout";
+import VendorOrderTracker from "./AdminDashboard/VendorOrderTracker";
 
 // 🔐 Protected Route (User login check)
 const ProtectedRoute = ({ children }) => {
@@ -66,6 +67,16 @@ function App() {
                 <VendorRoute>
                   <MainLayout>
                   <Inventory />
+                  </MainLayout>
+                </VendorRoute>
+              }
+            />
+            <Route
+              path="/vendor/orderTracker"
+              element={
+                <VendorRoute>
+                  <MainLayout>
+                  <VendorOrderTracker />
                   </MainLayout>
                 </VendorRoute>
               }
