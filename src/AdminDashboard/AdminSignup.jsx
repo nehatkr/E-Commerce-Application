@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { BASE_URL } from "../utils/constants";
 
 const AdminSignup = () => {
   const navigate = useNavigate();
@@ -58,7 +57,7 @@ const AdminSignup = () => {
 
     try {
       const res = await axios.post(
-        `${BASE_URL}/api/vendors`,
+        "http://localhost:8080/api/vendors",
         payload,
         {
           headers: {

@@ -3,7 +3,6 @@ import { useDispatch } from "react-redux";
 import { login } from "../redux/authSlice";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import { BASE_URL } from "../utils/constants";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -20,7 +19,7 @@ const handleLogin = async (e) => {
 
   try {
     const response = await axios.post(
-      `${BASE_URL}/api/auth/login`,
+      "http://localhost:8080/api/auth/login",
       { email, password, role }
     );
 

@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { fetchProducts } from "../redux/productsSlice";
-import { BASE_URL } from "../utils/constants";
+
 
 const Inventory = () => {
   const { user } = useSelector((state) => state.auth);
@@ -85,18 +85,19 @@ const Inventory = () => {
       });
 
       await axios.post(
-        `${BASE_URL}/api/product`,
+        "http://localhost:8080/api/product",
         formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        },
+        }
       );
 
       alert("✅ Product added successfully");
-      // 🔥 refresh product list everywhere
+            // 🔥 refresh product list everywhere
       dispatch(fetchProducts());
+
 
       setForm({
         name: "",
@@ -126,50 +127,35 @@ const Inventory = () => {
         onSubmit={handleSubmit}
         className="bg-white p-6 shadow-lg rounded-lg space-y-6 border-gray-900"
       >
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Product Name *
-          </label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <input
-              className="input-field"
-              placeholder="Product Name *"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              required
-            />
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <input
+            className="input-field"
+            placeholder="Product Name *"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            required
+          />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Category *
-          </label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <select
-              className="input-field"
-              value={form.category}
-              onChange={(e) => setForm({ ...form, category: e.target.value })}
-            >
-              <option value="men">Men</option>
-              <option value="women">Women</option>
-              <option value="kids">Kids</option>
-              <option value="accessories">Accessories</option>
-            </select>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <select
+            className="input-field"
+            value={form.category}
+            onChange={(e) => setForm({ ...form, category: e.target.value })}
+          >
+            <option value="men">Men</option>
+            <option value="women">Women</option>
+            <option value="kids">Kids</option>
+            <option value="accessories">Accessories</option>
+          </select>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Quantity *
-              </label>
-              <input
-                type="number"
-                className="input-field"
-                placeholder="Quantity"
-                value={form.quantity}
-                onChange={(e) => setForm({ ...form, quantity: e.target.value })}
-              />
-            </div>
-          </div>
+          <input
+            type="number"
+            className="input-field"
+            placeholder="Quantity"
+            value={form.quantity}
+            onChange={(e) => setForm({ ...form, quantity: e.target.value })}
+          />
         </div>
 
         <div>
@@ -188,7 +174,7 @@ const Inventory = () => {
             ))}
           </select>
         </div>
-            
+
         <div className="grid grid-cols-3 gap-4">
           <input
             type="number"
