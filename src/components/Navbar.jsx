@@ -220,7 +220,8 @@ const Navbar = () => {
                     </span>
                   </Link>
                 </li>
-                <li className="hover:text-gray-500 ">
+                {role === 'user' && (
+                    <li className="hover:text-gray-500 ">
                   <Link
                     to="/myOrders">
                       <span className="flex items-center gap-2 ">
@@ -229,7 +230,8 @@ const Navbar = () => {
                     </span>
                   </Link>
                 </li>
-
+                )}
+              
                 {role === "vendor" && (
                   <>
                     <li className="hover:text-gray-500">

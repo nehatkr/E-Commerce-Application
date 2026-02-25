@@ -1,32 +1,92 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import axios from "axios";
 import { Camera, Plus, Trash2 } from "lucide-react";
+import { BASE_URL } from "../utils/constants";
 
 const MyProfile = () => {
   const { user } = useSelector((state) => state.auth);
   const role = user?.role?.toLowerCase();
 
+  /* ================= STATE ================= */
+
+  const [loading, setLoading] = useState(true);
   const [profileImage, setProfileImage] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
-  const [addresses, setAddresses] = useState([
-    { address1: "", address2: "", address3: "", pincode: "", phone: "" },
+  const [profile, setProfile] = useState({
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    gender: "",
+    email: "",
+    shopName: "",
+    website: "",
+    gstNumber: "",
+  });
+
+  const [addresses, setAddresses] = useState([]);
+
+  /* ================= FETCH PROFILE ================= */
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const url =
+      role === "vendor"
+        ? `${BASE_URL}/api/vendors/${user.id}`
+        : `${BASE_URL}/api/users/${user.id}`;
+
+    axios
+      .get(url)
+      .then((res) => {
+        const data = res.data;
+
+        setProfile({
+          firstName: data.firstName || "",
+          middleName: data.middleName || "",
+          lastName: data.lastName || "",
+          gender: data.gender || "",
+          email: data.email || "",
+          shopName: data.shopName || "",
+          website: data.website || "",
+          gstNumber: data.gstNumber || "",
+        });
+
+        setAddresses([
+          {
+            address1: data.permanentAddress || "",
+            address2: data.shopAddress || "",
+            address3: "",
+            pincode: data.pinCode || "",
+            phone: data.phoneNo || "",
+          },
+        ]);
+
+        if (data.profileImage) setProfileImage(data.profileImage);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, [user, role]);
+
+
+  /* ================= ADDRESS ================= */
+
+const addAddress = () => {
+  setAddresses([
+    ...addresses, // keep existing cards
+    {
+      address1: "",
+      address2: "",
+      address3: "",
+      pincode: "",
+      phone: "",
+    },
   ]);
-
-  /* ---------------- IMAGE UPLOAD ---------------- */
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setProfileImage(URL.createObjectURL(file));
-    }
-  };
-
-  /* ---------------- ADDRESS HANDLERS ---------------- */
-  const addAddress = () => {
-    setAddresses([
-      ...addresses,
-      { address1: "", address2: "", address3: "", pincode: "", phone: "" },
-    ]);
-  };
+};
 
   const removeAddress = (index) => {
     setAddresses(addresses.filter((_, i) => i !== index));
@@ -38,53 +98,102 @@ const MyProfile = () => {
     setAddresses(updated);
   };
 
+  /* ================= SAVE ================= */
+
+ const handleSave = async () => {
+  const addr = addresses[0] || {};
+   const formData = new FormData();
+
+  const payload = {
+    ...profile,
+    permanentAddress: addr.address1,
+    shopAddress: addr.address2,
+    pinCode: addr.pincode,
+    phoneNo: addr.phone,
+  };
+
+    // image
+  if (selectedFile) {
+    formData.append("profileImage", selectedFile);
+  }
+
+  const url =
+    role === "vendor"
+      ? `${BASE_URL}/api/vendors/update/${user.id}`
+      : `${BASE_URL}/api/users/update/${user.id}`;
+
+  try {
+    await axios.put(url, payload);
+    alert("Profile updated successfully ✅");
+  } catch (err) {
+    console.error(err);
+    alert("Failed to update profile ❌");
+  }
+};
+
+
+console.log("Selected file:", selectedFile);
+  if (loading) return <p className="text-center mt-20">Loading profile...</p>;
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-12 mt-16">
       <h1 className="text-3xl font-bold mb-10">My Profile</h1>
 
-      <div className="bg-white rounded-2xl shadow p-8 space-y-10">
-
-        {/* ================= PROFILE IMAGE ================= */}
-        <div className="flex items-center gap-6">
-          <div className="relative">
-            <img
-              src={profileImage || "/avatar.png"}
-              alt="Profile"
-              className="w-28 h-28 rounded-full object-cover border"
-            />
-            <label className="absolute bottom-0 right-0 bg-black p-2 rounded-full cursor-pointer">
-              <Camera size={16} className="text-white" />
-              <input type="file" hidden onChange={handleImageUpload} />
-            </label>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-semibold">
-              {user?.firstName} {user?.lastName}
-            </h2>
-            <p className="text-gray-500 capitalize">{role}</p>
-          </div>
-        </div>
+      <div className="bg-white rounded-2xl shadow p-8 space-y-10"> 
 
         {/* ================= PERSONAL DETAILS ================= */}
         <Section title="Personal Details">
-          <ReadOnly label="First Name" value={user?.firstName} />
-          <ReadOnly label="Middle Name" value={user?.middleName || "-"} />
-          <ReadOnly label="Last Name" value={user?.lastName} />
-          <ReadOnly label="Gender" value={user?.gender} />
-          <ReadOnly label="Email" value={user?.email} />
+          <Input
+            label="First Name"
+            value={profile.firstName}
+            onChange={(e) =>
+              setProfile({ ...profile, firstName: e.target.value })
+            }
+          />
+          <Input
+            label="Middle Name"
+            value={profile.middleName}
+            onChange={(e) =>
+              setProfile({ ...profile, middleName: e.target.value })
+            }
+          />
+          <Input
+            label="Last Name"
+            value={profile.lastName}
+            onChange={(e) =>
+              setProfile({ ...profile, lastName: e.target.value })
+            }
+          />
+          <Input
+            label="Gender"
+            value={profile.gender}
+            onChange={(e) => setProfile({ ...profile, gender: e.target.value })}
+          />
+          <ReadOnly label="Email" value={profile.email} />
         </Section>
 
-        {/* ================= VENDOR FIELDS ================= */}
+        {/* ================= VENDOR ================= */}
         {role === "vendor" && (
           <Section title="Business Details">
-            <ReadOnly label="Shop Name" value={user?.shopName || "-"} />
-            <ReadOnly label="Website URL" value={user?.website || "-"} />
-            <ReadOnly label="GST Number" value={user?.gstNumber || "-"} />
+            <Input
+              label="Shop Name"
+              value={profile.shopName}
+              onChange={(e) =>
+                setProfile({ ...profile, shopName: e.target.value })
+              }
+            />
+            <Input
+              label="Website URL"
+              value={profile.website}
+              onChange={(e) =>
+                setProfile({ ...profile, website: e.target.value })
+              }
+            />
+            <ReadOnly label="GST Number" value={profile.gstNumber} />
           </Section>
         )}
 
-        {/* ================= ADDRESS ================= */}
+        {/* ================= ADDRESSES ================= */}
         <div>
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold">Addresses</h3>
@@ -154,7 +263,10 @@ const MyProfile = () => {
         </div>
 
         {/* ================= SAVE ================= */}
-        <button className="w-full md:w-60 bg-black text-white py-3 rounded-xl">
+        <button
+          onClick={handleSave}
+          className="w-full md:w-60 bg-black text-white py-3 rounded-xl"
+        >
           Save Changes
         </button>
       </div>
@@ -162,7 +274,7 @@ const MyProfile = () => {
   );
 };
 
-/* ---------------- SMALL COMPONENTS ---------------- */
+/* ================= SMALL COMPONENTS ================= */
 
 const Section = ({ title, children }) => (
   <div>
