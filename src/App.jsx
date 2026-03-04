@@ -12,7 +12,8 @@ import Signup from "./pages/Signup";
 import Inventory from "./AdminDashboard/Inventory";
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
-
+import Checkout from "./pages/Checkout";
+import OrderSuccess from "./pages/OrderSuccess";
 // Admin Pages
 import AdminSignup from "./AdminDashboard/AdminSignup";
 import EditProducts from "./AdminDashboard/EditProducts"; // Admin edit page
@@ -20,8 +21,6 @@ import VendorDashboard from "./AdminDashboard/Dashboard";
 import CartPage from "./pages/CartPage";
 import MyProfile from "./pages/MyProfile";
 import MyOrders from "./pages/myOrders";
-import MainLayout from "./style/MainLayout";
-import VendorOrderTracker from "./AdminDashboard/VendorOrderTracker";
 
 // 🔐 Protected Route (User login check)
 const ProtectedRoute = ({ children }) => {
@@ -58,26 +57,15 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/order-success" element={<OrderSuccess />} />
             {/* ADMIN / VENDOR SIGNUP (PUBLIC) */}
             <Route path="/admin/signup" element={<AdminSignup />} />
             <Route
               path="/inventory"
               element={
                 <VendorRoute>
-                  <MainLayout>
                   <Inventory />
-                  </MainLayout>
-                </VendorRoute>
-              }
-            />
-            <Route
-              path="/vendor/orderTracker"
-              element={
-                <VendorRoute>
-                  <MainLayout>
-                  <VendorOrderTracker />
-                  </MainLayout>
                 </VendorRoute>
               }
             />
@@ -85,9 +73,7 @@ function App() {
               path="/vendor/dashboard"
               element={
                 <ProtectedRoute>
-                  <MainLayout>
                   <VendorDashboard />
-                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -96,9 +82,7 @@ function App() {
               path="/admin/edit-products"
               element={
                 <VendorRoute>
-                  <MainLayout>
                   <EditProducts />
-                  </MainLayout>
                 </VendorRoute>
               }
             />
@@ -115,9 +99,7 @@ function App() {
               path="/inventory"
               element={
                 <ProtectedRoute>
-                  <MainLayout>
                   <Inventory />
-                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -126,9 +108,7 @@ function App() {
               path="/cart"
               element={
                 <ProtectedRoute>
-                  <MainLayout>
                   <CartPage />
-                </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -139,9 +119,7 @@ function App() {
               path="/products"
               element={
                 <ProtectedRoute>
-                  <MainLayout>
                   <Products />
-                </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -150,9 +128,7 @@ function App() {
               path="/products/:id"
               element={
                 <ProtectedRoute>
-                  <MainLayout>
                   <ProductDetails />
-                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -162,9 +138,7 @@ function App() {
               path="/admin/edit-products"
               element={
                 <ProtectedRoute>
-                  <MainLayout>
                   <EditProducts />
-                  </MainLayout>
                 </ProtectedRoute>
               }
             />

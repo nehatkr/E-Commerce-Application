@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchVendorProducts } from "../redux/vendorProductsSlice";
 import { removeProduct } from "../redux/vendorProductsSlice";
-import { BASE_URL } from "../utils/constants";
 
-
+const BASE_URL = import.meta.env.VITE_PRODUCT_URL;
 
 const EditProducts = () => {
   const dispatch = useDispatch();
@@ -155,7 +154,6 @@ const EditProducts = () => {
               <th className="p-4">Final Price</th>
               <th className="p-4">Sizes</th>
               <th className="p-4">Cart</th>
-              <th className="p-4">Quantity</th>
               <th className="p-4">Action</th>
             </tr>
           </thead>
@@ -253,23 +251,6 @@ const EditProducts = () => {
                   {/* CART */}
                   <td className="p-4">
                     {product.quantity > 0 ? "✅ Available" : "❌ Out of Stock"}
-                  </td>
-                 <td className="p-4 text-center">
-                    {editingId === product.id ? (
-                      <input
-                        type="number"
-                        value={form.quantity}
-                        onChange={(e) =>
-                          setForm({
-                            ...form,
-                            quantity: e.target.value,
-                          })
-                        }
-                        className="border px-2 py-1 w-20"
-                      />
-                    ) : (
-                      `${product.quantity}`
-                    )}
                   </td>
 
                   {/* ACTION */}
