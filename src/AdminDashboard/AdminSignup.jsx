@@ -48,12 +48,13 @@ const AdminSignup = () => {
       gstNumber: formData.gstNumber,
       permanentAddress: formData.permanentAddress,
       shopAddress: formData.shopAddress,
-      pinCode: Number(formData.pinCode),
-      phoneNo: Number(formData.phoneNo),
+      pinCode: formData.pinCode ? Number(formData.pinCode) : null,
+      phoneNo: formData.phoneNo ? Number(formData.phoneNo) : null,
       password: formData.password,
       confirmPassword: formData.confirmPassword,
-      role: "vendor",
+      role: formData.role,
     };
+ 
 
     try {
       const res = await axios.post(
@@ -132,9 +133,9 @@ const AdminSignup = () => {
                 required
               >
                 <option value="">Select Gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
               </select>
             </div>
           </div>

@@ -59,64 +59,60 @@ const Inventory = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      const formData = new FormData();
+  try {
+    // basic frontend validation (prevents 400)
+    if (!user?.id) return alert("Vendor not logged in");
+    if (!form.name.trim()) return alert("Product name required");
+    if (!form.category.trim()) return alert("Category required");
+    if (!form.originalPrice || Number(form.originalPrice) <= 0)
+      return alert("Original price must be > 0");
+    if (form.discount && (Number(form.discount) < 0 || Number(form.discount) > 100))
+      return alert("Discount must be between 0 and 100");
+    if (!form.discountedPrice) return alert("Discount price missing");
+    if (images.length === 0) return alert("Please select at least 1 image");
 
-      // ✅ EXACT BACKEND FIELD NAMES
-      formData.append("name", form.name);
-      formData.append("category", form.category);
-      formData.append("quantity", form.quantity);
-      formData.append("originalPrice", form.originalPrice);
-      formData.append("discount", form.discount || 0);
-      formData.append("discountPrice", form.discountedPrice);
-      formData.append("description", form.description);
+    const formData = new FormData();
 
-      // ✅ Backend expects "S,L"
-      formData.append("sizes", form.sizes.join(","));
-      formData.append("vendorId", user.id);
-      formData.append("vendorName", user.firstName);
-      formData.append("shopName", user.shopName);
+    // EXACT backend param names
+    formData.append("vendorId", String(user.id));
+    formData.append("name", form.name.trim());
+    formData.append("category", form.category);
+    formData.append("sizes", (form.sizes || []).join(",")); // "S,M,L"
+    formData.append("quantity", String(form.quantity || 0));
+    formData.append("discount", String(form.discount || 0));
+    formData.append("originalPrice", String(form.originalPrice));
+    formData.append("discountPrice", String(form.discountedPrice));
+    formData.append("description", form.description || "");
 
-      // ✅ Multiple images
-      images.forEach((img) => {
-        formData.append("images", img);
-      });
+    // key MUST be "images"
+    images.forEach((img) => formData.append("images", img));
 
-      await axios.post(
-        "http://localhost:8080/api/product",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+    await axios.post("http://localhost:8080/api/product", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
 
-      alert("✅ Product added successfully");
-            // 🔥 refresh product list everywhere
-      dispatch(fetchProducts());
+    alert("✅ Product added successfully");
+    dispatch(fetchProducts());
 
-
-      setForm({
-        name: "",
-        category: "men",
-        sizes: [],
-        quantity: "",
-        originalPrice: "",
-        discount: "",
-        discountedPrice: "",
-        description: "",
-      });
-      setImages([]);
-      setPreviews([]);
-    } catch (err) {
-      console.error(err);
-      alert("❌ Failed to add product");
-    }
-  };
-
+    setForm({
+      name: "",
+      category: "men",
+      sizes: [],
+      quantity: "",
+      originalPrice: "",
+      discount: "",
+      discountedPrice: "",
+      description: "",
+    });
+    setImages([]);
+    setPreviews([]);
+  } catch (err) {
+    console.error("ADD PRODUCT ERROR:", err?.response?.data || err);
+    alert(err?.response?.data?.message || "❌ Failed to add product");
+  }
+};
   return (
     <div className="max-w-3xl mx-auto py-10 px-4 mt-16">
       <h1 className="text-3xl font-bold mb-8 text-gray-800 text-center">

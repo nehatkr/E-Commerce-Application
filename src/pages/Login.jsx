@@ -36,7 +36,7 @@ const handleLogin = async (e) => {
     dispatch(login(normalizedUser));
 
     if (normalizedUser.role === "vendor") {
-      navigate("/inventory");
+      navigate("/");
     } else {
       navigate("/products");
     }

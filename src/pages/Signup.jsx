@@ -34,15 +34,27 @@ const Signup = () => {
     if (!formData.firstName) tempErrors.firstName = "First Name is required";
     if (!formData.lastName) tempErrors.lastName = "Last Name is required";
     if (!emailRegex.test(formData.email)) tempErrors.email = "Invalid Email";
-    if (!passwordRegex.test(formData.password))
-      tempErrors.password = "Invalid Password";
+    //if (!passwordRegex.test(formData.password))
+      //tempErrors.password = "Invalid Password";
     if (!phoneRegex.test(formData.phoneNumber))
       tempErrors.phoneNumber = "Invalid 10-digit Phone";
-    if (!formData.password || formData.password.length < 6)
-      tempErrors.password = "Password must be at least 6 chars";
-    if (formData.password !== formData.confirmPassword)
-      tempErrors.confirmPassword = "Passwords do not match";
+    //if (!formData.password || formData.password.length < 6)
+     // tempErrors.password = "Password must be at least 6 chars";
 
+    if (!formData.password) {
+      tempErrors.password = "Password is required";
+    } else if (!passwordRegex.test(formData.password)) {
+      tempErrors.password =
+        "Password must be 8+ chars, 1 uppercase, 1 number, 1 special";
+    }
+ 
+ 
+    if (!formData.confirmPassword) {
+      tempErrors.confirmPassword = "Confirm Password required";
+    } else if (formData.password !== formData.confirmPassword) {
+      tempErrors.confirmPassword = "Passwords do not match";
+    }
+   
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
@@ -215,7 +227,7 @@ const Signup = () => {
               />
             </div>
           </div>
-          <span className="text-red-500 text-xs">{errors.phone}</span>
+          <span className="text-red-500 text-xs">{errors.phoneNumber}</span>
 
           <div className="block text-sm font-medium text-gray-700">
             <label className="floating-label">Address L1 *</label>
