@@ -61,43 +61,43 @@ const OrderSuccess = () => {
   }
 
   return (
-  <div className="min-h-[70vh] flex items-center justify-center bg-gray-50 px-4">
-    <div className="w-full max-w-2xl bg-white border rounded-xl shadow-md p-8">
-      <h1 className="text-2xl font-bold text-center">
-        ✅ Order Placed Successfully
-      </h1>
+    <div className="min-h-[70vh] flex items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-2xl bg-white border rounded-xl shadow-md p-8">
+        <h1 className="text-2xl font-bold text-center">
+          ✅ Order Placed Successfully
+        </h1>
 
-      <p className="text-gray-600 text-center mt-2">
-        Your order has been placed. We will deliver it soon.
-      </p>
-
-      <hr className="my-6" />
-
-      <div className="space-y-3 text-sm">
-        <p><b>Order ID:</b> {order.orderId}</p>
-        <p><b>Name:</b> {order.name}</p>
-        <p><b>Email:</b> {order.email}</p>
-        <p><b>Amount:</b> ₹{order.amount}</p>
-        <p><b>Payment Mode:</b> {order.paymentMode}</p>
-        <p><b>Status:</b> {order.orderStatus}</p>
-        <p>
-          <b>Estimated Delivery Date:</b>{" "}
-          <span className="px-2 py-1 bg-gray-100 rounded">
-            {order.estimatedDeliveryDate}
-          </span>
+        <p className="text-gray-600 text-center mt-2">
+          Your order has been placed. We will deliver it soon.
         </p>
+
+        <hr className="my-6" />
+
+        <div className="space-y-3 text-sm">
+          <p><b>Order ID:</b> {order.orderId}</p>
+          <p><b>Name:</b> {order.name}</p>
+          <p><b>Email:</b> {order.email}</p>
+          <p><b>Amount:</b> ₹{order.amount}</p>
+          <p><b>Payment Mode:</b> {order.paymentMode}</p>
+          <p><b>Status:</b> {order.orderStatus}</p>
+          <p>
+            <b>Estimated Delivery Date:</b>{" "}
+            <span className="px-2 py-1 bg-gray-100 rounded">
+              {order.estimatedDeliveryDate}
+            </span>
+          </p>
+        </div>
+        <div className="mt-8 flex justify-center">
+          <button
+            className="px-6 py-2 bg-black text-white rounded-md hover:opacity-90"
+            onClick={() => navigate("/products")}
+          >
+            Continue Shopping
+          </button>
+        </div>
       </div>
-<div className="mt-8 flex justify-center">
-  <button
-    className="px-6 py-2 bg-black text-white rounded-md hover:opacity-90"
-    onClick={() => navigate("/products")}
-  >
-    Continue Shopping
-  </button>
-</div>
     </div>
-  </div>
-);
+  );
 };
 
 export default OrderSuccess;

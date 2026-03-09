@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Checkout = () => {
   const PRODUCT_URL = "http://localhost:8080"; // product backend
@@ -138,9 +139,14 @@ const Checkout = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          userId: user?.id,
           name: form.fullName,
           email: form.email,
-          amount: computedTotal, // rupees
+          amount: computedTotal,
+
+          productId: items[0]?.id || items[0]?.product?.id,
+          vendorId: items[0]?.product?.vendorId || items[0]?.vendorId,
+          quantity: items[0]?.quantity || 1
         }),
       });
 
@@ -151,13 +157,13 @@ const Checkout = () => {
 
       const order = await res.json();
 
-      
+
 
       // ✅ Redirect to success page
-     window.location.href = `/order-success?orderId=${order.orderId}`;
+      window.location.href = `/order-success?orderId=${order.orderId}`;
     } catch (e) {
       console.error(e);
-     
+
     }
   };
 
@@ -177,9 +183,14 @@ const Checkout = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          userId: user?.id,
           name: form.fullName,
           email: form.email,
-          amount: computedTotal, // rupees
+          amount: computedTotal,
+
+          productId: items[0]?.id,
+          vendorId: items[0]?.product?.vendorId || items[0]?.vendorId,
+          quantity: items[0]?.quantity || 1
         }),
       });
 
@@ -227,8 +238,8 @@ const Checkout = () => {
             const cbData = await cbRes.json();
             console.log("Callback:", cbData);
 
-           
-window.location.href = `/order-success?orderId=${cbData.orderId}`;
+
+            window.location.href = `/order-success?orderId=${cbData.orderId}`;
           } catch (err) {
             console.error(err);
             alert("Payment verification failed ❌");
@@ -520,9 +531,8 @@ window.location.href = `/order-success?orderId=${cbData.orderId}`;
                   if (selectedMethod === "COD") confirmCOD();
                   if (selectedMethod === "ONLINE") proceedOnlinePayment();
                 }}
-                className={`w-1/2 py-2 rounded-md text-white ${
-                  selectedMethod ? "bg-black" : "bg-gray-400 cursor-not-allowed"
-                }`}
+                className={`w-1/2 py-2 rounded-md text-white ${selectedMethod ? "bg-black" : "bg-gray-400 cursor-not-allowed"
+                  }`}
               >
                 Continue
               </button>

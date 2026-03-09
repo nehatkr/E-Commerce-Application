@@ -32,8 +32,11 @@ const MyOrders = () => {
     if (!user?.id) return;
 
     axios
-      .get(`${BASE_URL}/api/delivery/user/${user.id}`)
-      .then((res) => setOrders(res.data))
+      .get(`http://localhost:8081/api/orders/user/${user.id}`)
+      .then((res) => {
+        console.log(res.data);   // check here
+        setOrders(res.data);
+      })
       .catch((err) => console.error(err));
   }, [user]);
 
@@ -51,13 +54,11 @@ const MyOrders = () => {
 
       <div className="space-y-6">
         {orders.map((order) => {
-          const currentIndex = STATUS_STEPS.indexOf(
-            order.status
-          );
+          const currentIndex = STATUS_STEPS.indexOf(order.orderStatus);
 
           return (
             <div
-              key={order.id}
+              key={order.orderId}
               className="bg-white rounded-xl shadow-md p-6"
             >
               {/* HEADER */}
@@ -67,12 +68,10 @@ const MyOrders = () => {
                     Order ID
                   </p>
                   <p className="font-semibold">
-                    #{order.id}
+                    #{order.orderId}
                   </p>
                   <p className="text-sm text-gray-500 mt-1">
-                    {new Date(
-                      order.updatedAt
-                    ).toLocaleDateString()}
+                    {new Date(order.createdAt).toLocaleDateString()}
                   </p>
                 </div>
 
@@ -81,7 +80,7 @@ const MyOrders = () => {
                     Status
                   </p>
                   <span className="px-3 py-1 rounded-full text-xs font-semibold bg-black text-white">
-                    {order.status.replaceAll("_", " ")}
+                    {order.orderStatus.replaceAll("_", " ")}
                   </span>
                 </div>
               </div>
@@ -98,11 +97,10 @@ const MyOrders = () => {
                     >
                       <div className="flex flex-col items-center">
                         <div
-                          className={`w-9 h-9 rounded-full flex items-center justify-center ${
-                            isActive
-                              ? "bg-black text-white"
-                              : "bg-gray-300 text-gray-600"
-                          }`}
+                          className={`w-9 h-9 rounded-full flex items-center justify-center ${isActive
+                            ? "bg-black text-white"
+                            : "bg-gray-300 text-gray-600"
+                            }`}
                         >
                           {getStatusIcon(step, isActive)}
                         </div>
@@ -113,14 +111,13 @@ const MyOrders = () => {
 
                       {index !==
                         STATUS_STEPS.length - 1 && (
-                        <div
-                          className={`flex-1 h-1 mx-2 ${
-                            index < currentIndex
+                          <div
+                            className={`flex-1 h-1 mx-2 ${index < currentIndex
                               ? "bg-black"
                               : "bg-gray-300"
-                          }`}
-                        />
-                      )}
+                              }`}
+                          />
+                        )}
                     </div>
                   );
                 })}
@@ -143,7 +140,7 @@ const MyOrders = () => {
                     {order.product?.name}
                   </p>
                   <p className="text-sm text-gray-500">
-                    Qty: {order.deliveredQuantity}
+                    Qty: {order.quantity}
                   </p>
                 </div>
               </div>
