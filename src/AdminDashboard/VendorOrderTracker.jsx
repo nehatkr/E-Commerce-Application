@@ -22,6 +22,7 @@ const VendorDeliveryTracker = ({ vendorId }) => {
       const res = await axios.get(
         `${BASE_URL}/api/delivery/vendor/${vendorId}`
       );
+      console.log("Delivery response", res)
       setDeliveries(res.data);
     //   console.log(res);
     } catch (err) {

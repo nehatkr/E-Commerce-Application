@@ -1,5 +1,40 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { BASE_URL } from "../utils/constants";
+
+const getProductImage = (product) => {
+  if (product?.images?.length > 0) {
+    const first = product.images[0];
+
+    if (typeof first === "string") return first;
+    return first.imageUrl || first.url || "";
+  }
+
+  if (product?.image?.length > 0) {
+    const first = product.image[0];
+
+    if (typeof first === "string") return first;
+    return first.imageUrl || first.url || "";
+  }
+
+  return (
+    product.imageUrl ||
+    product.image_url ||
+    product.thumbnail ||
+    product.img ||
+    ""
+  );
+};
+
+const getVendorId = (product) => {
+  return (
+    product.vendorId ??
+    product.vendor_id ??
+    product.vendor?.id ??
+    product.product?.vendorId ??
+    product.product?.vendor_id ??
+    product.product?.vendor?.id ??
+    null
+  );
+};
 
 const cartSlice = createSlice({
   name: "cart",
@@ -7,33 +42,35 @@ const cartSlice = createSlice({
     items: [],
   },
   reducers: {
-addToCart: (state, action) => {
-  const product = action.payload;
+    addToCart: (state, action) => {
+      const product = action.payload;
 
-  const existingItem = state.items.find(
-    (item) => item.id === product.id
-  );
+      console.log("ADD TO CART payload:", product);
 
-  if (existingItem) {
-    existingItem.quantity += 1;
-    return;
-  }
+      const existingItem = state.items.find((item) => item.id === product.id);
 
-  state.items.push({
-    id: product.id,
-    name: product.name,
-    description: product.shortDescription || product.description || "",
-    price: Number(
-      product.discountedPrice ??
-      product.discountPrice ??
-      product.originalPrice ??
-      product.price ??
-      0
-    ),
-    images: product.images || [],
-    quantity: 1,
-  });
-},
+      if (existingItem) {
+        existingItem.quantity += 1;
+        return;
+      }
+
+      state.items.push({
+        id: product.id,
+        name: product.name,
+        description: product.shortDescription || product.description || "",
+        price: Number(
+          product.discountedPrice ??
+            product.discountPrice ??
+            product.originalPrice ??
+            product.price ??
+            0
+        ),
+        quantity: 1,
+        imageUrl: getProductImage(product),
+        images: product.images || product.image || [],
+        vendorId: getVendorId(product), // important
+      });
+    },
 
     removeFromCart: (state, action) => {
       state.items = state.items.filter((i) => i.id !== action.payload);

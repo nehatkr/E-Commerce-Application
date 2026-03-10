@@ -9,39 +9,33 @@ import Footer from "./pages/Footer";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Inventory from "./AdminDashboard/Inventory";
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
 import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";
-// Admin Pages
-import AdminSignup from "./AdminDashboard/AdminSignup";
-import EditProducts from "./AdminDashboard/EditProducts"; // Admin edit page
-import VendorDashboard from "./AdminDashboard/Dashboard";
 import CartPage from "./pages/CartPage";
 import MyProfile from "./pages/MyProfile";
 import MyOrders from "./pages/myOrders";
 
-// 🔐 Protected Route (User login check)
+// Vendor / Admin Pages
+import Inventory from "./AdminDashboard/Inventory";
+import AdminSignup from "./AdminDashboard/AdminSignup";
+import EditProducts from "./AdminDashboard/EditProducts";
+import VendorDashboard from "./AdminDashboard/Dashboard";
+import VendorOrderTracker from "./AdminDashboard/VendorOrderTracker";
+
+// Protected Route
 const ProtectedRoute = ({ children }) => {
   const { isLoggedIn } = useSelector((state) => state.auth);
   return isLoggedIn ? children : <Navigate to="/login" />;
 };
 
-/*
- 🔮 FUTURE ADMIN ROLE CHECK (backend ready)
- 
- const AdminRoute = ({ children }) => {
-   const { user } = useSelector((state) => state.auth);
-   return user?.role === "admin"
-     ? children
-     : <Navigate to="/" />;
- };
-*/
-
+// Vendor Route
 const VendorRoute = ({ children }) => {
   const { user } = useSelector((state) => state.auth);
-  return user?.role === "vendor" ? children : <Navigate to="/" />;
+  return user?.role?.toLowerCase() === "vendor"
+    ? children
+    : <Navigate to="/" />;
 };
 
 function App() {
@@ -50,71 +44,15 @@ function App() {
       <div className="min-h-screen bg-gray-50 overflow-x-hidden flex flex-col">
         <Navbar />
 
-        {/* MAIN CONTENT */}
         <main className="grow">
           <Routes>
-            {/* ================= PUBLIC ROUTES ================= */}
+            {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/order-success" element={<OrderSuccess />} />
-            {/* ADMIN / VENDOR SIGNUP (PUBLIC) */}
             <Route path="/admin/signup" element={<AdminSignup />} />
-            <Route
-              path="/inventory"
-              element={
-                <VendorRoute>
-                  <Inventory />
-                </VendorRoute>
-              }
-            />
-            <Route
-              path="/vendor/dashboard"
-              element={
-                <ProtectedRoute>
-                  <VendorDashboard />
-                </ProtectedRoute>
-              }
-            />
 
-            <Route
-              path="/admin/edit-products"
-              element={
-                <VendorRoute>
-                  <EditProducts />
-                </VendorRoute>
-              }
-            />
-            <Route
-              path="/myOrders"
-              element={
-                  <MyOrders />
-                
-              }
-            />
-
-            {/* ================= PROTECTED USER ROUTES ================= */}
-            <Route
-              path="/inventory"
-              element={
-                <ProtectedRoute>
-                  <Inventory />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/cart"
-              element={
-                <ProtectedRoute>
-                  <CartPage />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route path="/profile" element={<MyProfile />} />
-
+            {/* Protected User Routes */}
             <Route
               path="/products"
               element={
@@ -133,17 +71,89 @@ function App() {
               }
             />
 
-            {/* ================= ADMIN ROUTES ================= */}
             <Route
-              path="/admin/edit-products"
+              path="/cart"
               element={
                 <ProtectedRoute>
-                  <EditProducts />
+                  <CartPage />
                 </ProtectedRoute>
               }
             />
 
-            {/* ================= FALLBACK ================= */}
+            <Route
+              path="/checkout"
+              element={
+                <ProtectedRoute>
+                  <Checkout />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/order-success"
+              element={
+                <ProtectedRoute>
+                  <OrderSuccess />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <MyProfile />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/myOrders"
+              element={
+                <ProtectedRoute>
+                  <MyOrders />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Vendor Routes */}
+            <Route
+              path="/inventory"
+              element={
+                <VendorRoute>
+                  <Inventory />
+                </VendorRoute>
+              }
+            />
+
+            <Route
+              path="/vendor/dashboard"
+              element={
+                <VendorRoute>
+                  <VendorDashboard />
+                </VendorRoute>
+              }
+            />
+
+            <Route
+              path="/admin/edit-products"
+              element={
+                <VendorRoute>
+                  <EditProducts />
+                </VendorRoute>
+              }
+            />
+
+            <Route
+              path="/vendor/orderTracker"
+              element={
+                <VendorRoute>
+                  <VendorOrderTracker vendorId={1} />
+                </VendorRoute>
+              }
+            />
+
+            {/* Fallback */}
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </main>

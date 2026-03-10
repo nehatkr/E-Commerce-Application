@@ -31,21 +31,32 @@ const productSlice = createSlice({
           id: p.id,
           name: p.name,
           category: p.category,
-          shortDescription: p.description,
-          price: p.originalPrice,
-          quantity: p.quantity, 
-          discountedPrice: p.discountPrice,
-          discountPercentage: p.discount,
+          shortDescription: p.description || "",
+          description: p.description || "",
+          price: p.originalPrice ?? p.price ?? 0,
+          originalPrice: p.originalPrice ?? p.price ?? 0,
+          quantity: p.quantity ?? 0,
+          discountedPrice: p.discountPrice ?? p.discountedPrice ?? p.price ?? 0,
+          discountPrice: p.discountPrice ?? p.discountedPrice ?? p.price ?? 0,
+          discountPercentage: p.discount ?? 0,
           sizes: p.sizes ? p.sizes.split(",") : [],
           images: (p.images || [])
-            .filter((img) => img.imageUrl)
+            .filter((img) => img?.imageUrl || img?.url)
             .map((img) => ({
               ...img,
-              imageUrl: img.imageUrl.startsWith("http")
-                ? img.imageUrl
-                : `${BASE_URL}${img.imageUrl}`,
+              imageUrl: (img.imageUrl || img.url).startsWith("http")
+                ? img.imageUrl || img.url
+                : `${BASE_URL}${img.imageUrl || img.url}`,
             })),
-          addToCartEnabled: p.quantity > 0,
+          imageUrl:
+            p.imageUrl ||
+            p.image_url ||
+            (p.images?.[0]?.imageUrl
+              ? p.images[0].imageUrl.startsWith("http")
+                ? p.images[0].imageUrl
+                : `${BASE_URL}${p.images[0].imageUrl}`
+              : ""),
+          addToCartEnabled: (p.quantity ?? 0) > 0,
         }));
       })
       .addCase(fetchProducts.rejected, (state, action) => {
