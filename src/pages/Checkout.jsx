@@ -3,8 +3,8 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const Checkout = () => {
-  const PRODUCT_URL = "http://localhost:8080"; // product backend
-  const PAYMENT_URL = "http://localhost:8081"; // payment gateway backend
+  const PRODUCT_URL = "http://localhost:8080";
+  const PAYMENT_URL = "http://localhost:8081";
   const RAZORPAY_KEY = "rzp_test_RtVxX2GgS4LcYd";
 
   const navigate = useNavigate();
@@ -12,25 +12,34 @@ const Checkout = () => {
   const items = useSelector((state) => state.cart.items || []);
   const user = useSelector((state) => state.auth.user);
 
-  // ===== Helpers =====
+  console.log("Checkout items:", items);
+
   const makeFullUrl = (url) => {
-    if (!url) return "";
-    if (url.startsWith("http")) return url;
-    return `${PRODUCT_URL}${url}`;
+    if (!url) return "/placeholder.png";
+    const clean = String(url).trim();
+    if (!clean) return "/placeholder.png";
+    if (clean.startsWith("http://") || clean.startsWith("https://")) {
+      return clean;
+    }
+    return `${PRODUCT_URL}${clean.startsWith("/") ? clean : `/${clean}`}`;
   };
 
   const getImage = (item) => {
     const raw =
-      item.image?.[0]?.imageUrl ||
-      item.image_url ||
       item.imageUrl ||
+      item.images?.[0]?.imageUrl ||
+      item.images?.[0]?.url ||
+      (typeof item.images?.[0] === "string" ? item.images[0] : "") ||
+      item.image?.[0]?.imageUrl ||
+      item.image?.[0]?.url ||
+      (typeof item.image?.[0] === "string" ? item.image[0] : "") ||
+      item.image_url ||
       item.image ||
       item.thumbnail ||
       item.img ||
       "";
 
-    const full = makeFullUrl(raw);
-    return full || "https://via.placeholder.com/60";
+    return makeFullUrl(raw);
   };
 
   const getPrice = (item) => {
@@ -55,6 +64,21 @@ const Checkout = () => {
 
   const getQty = (item) => Number(item.quantity) || 1;
 
+  const getProductId = (item) =>
+    item?.productId ??
+    item?.id ??
+    item?.product?.id ??
+    null;
+
+  const getVendorId = (item) =>
+    item?.vendorId ??
+    item?.vendor_id ??
+    item?.vendor?.id ??
+    item?.product?.vendorId ??
+    item?.product?.vendor_id ??
+    item?.product?.vendor?.id ??
+    null;
+
   const computedTotal = useMemo(() => {
     return items.reduce((acc, item) => acc + getPrice(item) * getQty(item), 0);
   }, [items]);
@@ -70,7 +94,6 @@ const Checkout = () => {
       document.body.appendChild(script);
     });
 
-  // ===== Form =====
   const [form, setForm] = useState({
     fullName: user?.firstName
       ? `${user.firstName} ${user?.lastName || ""}`.trim()
@@ -84,10 +107,37 @@ const Checkout = () => {
   });
 
   const [errors, setErrors] = useState({});
-
-  // ===== Payment modal state =====
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [selectedMethod, setSelectedMethod] = useState(""); // "ONLINE" | "COD"
+  const [selectedMethod, setSelectedMethod] = useState("");
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [loadingAddresses, setLoadingAddresses] = useState(false);
+  const [addressTab, setAddressTab] = useState("SAVED");
+  const [savingAddress, setSavingAddress] = useState(false);
+
+  const [newAddress, setNewAddress] = useState({
+    type: "HOME",
+    line1: "",
+    line2: "",
+    line3: "",
+    pinCode: "",
+    city: "",
+    state: "",
+    phoneNumber: "",
+  });
+
+  const buildOrderPayload = () => {
+    const firstItem = items[0];
+
+    return {
+      name: form.fullName,
+      email: form.email,
+      amount: computedTotal,
+      productId: firstItem ? getProductId(firstItem) : null,
+      vendorId: firstItem ? getVendorId(firstItem) : null,
+      quantity: firstItem ? getQty(firstItem) : 1,
+    };
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -117,51 +167,182 @@ const Checkout = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // ✅ Step 1: Proceed to Pay button click -> validate first -> open modal
+  const fetchSavedAddresses = async () => {
+    if (!user?.id) {
+      alert("Please login first");
+      return;
+    }
+
+    try {
+      setLoadingAddresses(true);
+      const res = await fetch(`${PRODUCT_URL}/api/address/user/${user.id}`);
+      if (!res.ok) {
+        const t = await res.text().catch(() => "");
+        alert(t || "Failed to load addresses");
+        return;
+      }
+
+      const data = await res.json();
+      setSavedAddresses(Array.isArray(data) ? data : []);
+      setAddressTab("SAVED");
+      setShowAddressModal(true);
+    } catch (err) {
+      console.error(err);
+      alert("Could not load saved addresses");
+    } finally {
+      setLoadingAddresses(false);
+    }
+  };
+
+  const applyAddress = (addr) => {
+    const fullAddress = [addr.line1, addr.line2, addr.line3]
+      .filter(Boolean)
+      .join(", ");
+
+    setForm((prev) => ({
+      ...prev,
+      address: fullAddress,
+      pincode: addr.pinCode ? String(addr.pinCode) : "",
+      city: addr.city || "",
+      state: addr.state || "",
+      phone: addr.phoneNumber || "",
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      address: "",
+      pincode: "",
+      city: "",
+      state: "",
+      phone: "",
+    }));
+
+    setShowAddressModal(false);
+  };
+
+  const handleNewAddressChange = (e) => {
+    const { name, value } = e.target;
+    setNewAddress((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const resetNewAddress = () => {
+    setNewAddress({
+      type: "HOME",
+      line1: "",
+      line2: "",
+      line3: "",
+      pinCode: "",
+      city: "",
+      state: "",
+      phoneNumber: "",
+    });
+  };
+
+  const saveNewAddress = async () => {
+    if (!user?.id) {
+      alert("Please login first");
+      return;
+    }
+
+    if (!newAddress.line1.trim()) return alert("Line 1 is required");
+    if (!newAddress.city.trim()) return alert("City is required");
+    if (!newAddress.state.trim()) return alert("State is required");
+    if (!/^\d{6}$/.test(String(newAddress.pinCode).trim())) {
+      return alert("Enter valid 6 digit pincode");
+    }
+    if (!/^\d{10}$/.test(String(newAddress.phoneNumber).trim())) {
+      return alert("Enter valid 10 digit phone number");
+    }
+
+    try {
+      setSavingAddress(true);
+
+      const res = await fetch(`${PRODUCT_URL}/api/address/user/${user.id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: newAddress.type,
+          line1: newAddress.line1,
+          line2: newAddress.line2,
+          line3: newAddress.line3,
+          pinCode: Number(newAddress.pinCode),
+          city: newAddress.city,
+          state: newAddress.state,
+          phoneNumber: newAddress.phoneNumber,
+        }),
+      });
+
+      if (!res.ok) {
+        const t = await res.text().catch(() => "");
+        alert(t || "Failed to save address");
+        return;
+      }
+
+      await fetchSavedAddresses();
+      setAddressTab("SAVED");
+      resetNewAddress();
+    } catch (e) {
+      console.error(e);
+      alert("Error saving address");
+    } finally {
+      setSavingAddress(false);
+    }
+  };
+
   const handleProceedToPay = () => {
     if (!items.length) {
       alert("Your cart is empty.");
       return;
     }
+
     if (!validate()) return;
+
+    const payload = buildOrderPayload();
+    console.log("Pre-check payload:", payload);
+
+    if (!payload.productId) {
+      alert("Product ID missing in cart item");
+      return;
+    }
+
+    if (!payload.vendorId) {
+      alert("Vendor ID missing in cart item");
+      return;
+    }
 
     setSelectedMethod("");
     setShowPaymentModal(true);
   };
 
-  // ✅ COD action -> call backend -> redirect to success page
   const confirmCOD = async () => {
     try {
       setShowPaymentModal(false);
 
+      const payload = buildOrderPayload();
+      console.log("COD payload:", payload);
+
       const res = await fetch(`${PAYMENT_URL}/createCodOrder`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.fullName,
-          email: form.email,
-          amount: computedTotal, // rupees
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
-        alert("COD order creation failed ❌");
+        const t = await res.text().catch(() => "");
+        alert(t || "COD order creation failed ❌");
         return;
       }
 
       const order = await res.json();
+      console.log("COD order response:", order);
 
-      
-
-      // ✅ Redirect to success page
-     window.location.href = `/order-success?orderId=${order.orderId}`;
+      window.location.href = `/order-success?orderId=${order.orderId}`;
     } catch (e) {
       console.error(e);
-     
+      alert("COD order failed ❌");
     }
   };
 
-  // ✅ Online payment action -> create order -> open Razorpay -> callback -> redirect
   const proceedOnlinePayment = async () => {
     try {
       setShowPaymentModal(false);
@@ -172,42 +353,38 @@ const Checkout = () => {
         return;
       }
 
-      // A) Create order from Spring Boot paymentgateway
+      const payload = buildOrderPayload();
+      console.log("ONLINE payload:", payload);
+
       const res = await fetch(`${PAYMENT_URL}/createOrder`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.fullName,
-          email: form.email,
-          amount: computedTotal, // rupees
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
-        alert("createOrder failed ❌");
+        const t = await res.text().catch(() => "");
+        alert(t || "createOrder failed ❌");
         return;
       }
 
-      const order = await res.json(); // has razorpayOrderId, orderId, amount, etc.
+      const order = await res.json();
+      console.log("ONLINE order response:", order);
 
-      // B) Open Razorpay popup
       const options = {
         key: RAZORPAY_KEY,
-        amount: order.amount * 100, // paise
+        amount: order.amount * 100,
         currency: "INR",
         name: "NovaShop",
         description: "Order Payment",
-        order_id: order.razorpayOrderId, // field from backend
-
+        order_id: order.razorpayOrderId,
         prefill: {
           name: form.fullName,
           email: form.email,
           contact: form.phone,
         },
-
         handler: async function (response) {
           try {
-            // C) Call paymentCallback after payment success
             const params = new URLSearchParams();
             params.append("razorpay_order_id", response.razorpay_order_id);
             params.append("razorpay_payment_id", response.razorpay_payment_id);
@@ -220,33 +397,31 @@ const Checkout = () => {
             });
 
             if (!cbRes.ok) {
-              alert("paymentCallback failed ❌");
+              const t = await cbRes.text().catch(() => "");
+              alert(t || "paymentCallback failed ❌");
               return;
             }
 
             const cbData = await cbRes.json();
-            console.log("Callback:", cbData);
+            console.log("Payment callback response:", cbData);
 
-           
-window.location.href = `/order-success?orderId=${cbData.orderId}`;
+            window.location.href = `/order-success?orderId=${cbData.orderId}`;
           } catch (err) {
             console.error(err);
             alert("Payment verification failed ❌");
           }
         },
-
         modal: {
           ondismiss: () => alert("Payment cancelled ❌"),
         },
-
         theme: { color: "#000000" },
       };
 
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (e) {
-      console.error(e);
-      alert("Online payment failed ❌");
+      console.error("Online payment error:", e);
+      alert(e?.message || "Online payment failed ❌ (check console)");
     }
   };
 
@@ -269,11 +444,19 @@ window.location.href = `/order-success?orderId=${cbData.orderId}`;
         <h1 className="text-2xl font-bold mb-6">Checkout</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* LEFT: Customer Information */}
           <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-xl font-semibold mb-4">
-              Customer Information
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Customer Information</h2>
+
+              <button
+                type="button"
+                onClick={fetchSavedAddresses}
+                className="text-sm px-3 py-2 border rounded-md hover:bg-gray-50"
+              >
+                Use Saved Address
+              </button>
+            </div>
+
             <hr className="mb-5" />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -394,7 +577,6 @@ window.location.href = `/order-success?orderId=${cbData.orderId}`;
             </div>
           </div>
 
-          {/* RIGHT: Order Summary */}
           <div className="bg-white rounded-lg shadow-sm border p-6 h-fit">
             <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
             <hr className="mb-5" />
@@ -412,7 +594,8 @@ window.location.href = `/order-success?orderId=${cbData.orderId}`;
                       alt={item.name}
                       className="w-14 h-14 rounded object-cover border"
                       onError={(e) => {
-                        e.currentTarget.src = "https://via.placeholder.com/60";
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "/placeholder.png";
                       }}
                     />
                     <div className="flex-1">
@@ -458,79 +641,265 @@ window.location.href = `/order-success?orderId=${cbData.orderId}`;
         </div>
       </div>
 
-      {/* PAYMENT METHOD MODAL */}
+      {showAddressModal && (
+        <div className="fixed inset-0 z-50 bg-black/50">
+          <div className="min-h-screen w-full flex items-center justify-center p-4">
+            <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-5 max-h-[80vh] overflow-auto">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-semibold">Delivery Address</h3>
+                <button
+                  onClick={() => setShowAddressModal(false)}
+                  className="text-gray-600 hover:text-black text-xl"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="flex gap-2 mb-4">
+                <button
+                  type="button"
+                  onClick={() => setAddressTab("SAVED")}
+                  className={`px-3 py-2 rounded-md text-sm border ${
+                    addressTab === "SAVED" ? "bg-black text-white" : "bg-white"
+                  }`}
+                >
+                  Saved
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAddressTab("ADD")}
+                  className={`px-3 py-2 rounded-md text-sm border ${
+                    addressTab === "ADD" ? "bg-black text-white" : "bg-white"
+                  }`}
+                >
+                  + Add New
+                </button>
+              </div>
+
+              {addressTab === "ADD" ? (
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm font-medium">Address Type</label>
+                    <select
+                      name="type"
+                      value={newAddress.type}
+                      onChange={handleNewAddressChange}
+                      className="w-full border rounded-md px-3 py-2"
+                    >
+                      <option value="HOME">Home</option>
+                      <option value="OFFICE">Office</option>
+                      <option value="OTHER">Other</option>
+                    </select>
+                  </div>
+
+                  <input
+                    name="line1"
+                    value={newAddress.line1}
+                    onChange={handleNewAddressChange}
+                    placeholder="Line 1 (House no, Street)"
+                    className="w-full border rounded-md px-3 py-2"
+                  />
+
+                  <input
+                    name="line2"
+                    value={newAddress.line2}
+                    onChange={handleNewAddressChange}
+                    placeholder="Line 2 (Area, Landmark)"
+                    className="w-full border rounded-md px-3 py-2"
+                  />
+
+                  <input
+                    name="line3"
+                    value={newAddress.line3}
+                    onChange={handleNewAddressChange}
+                    placeholder="Line 3 (Optional)"
+                    className="w-full border rounded-md px-3 py-2"
+                  />
+
+                  <input
+                    name="phoneNumber"
+                    value={newAddress.phoneNumber}
+                    onChange={handleNewAddressChange}
+                    placeholder="Phone Number"
+                    className="w-full border rounded-md px-3 py-2"
+                  />
+
+                  <input
+                    name="pinCode"
+                    value={newAddress.pinCode}
+                    onChange={handleNewAddressChange}
+                    placeholder="6 digit Pincode"
+                    className="w-full border rounded-md px-3 py-2"
+                  />
+
+                  <input
+                    name="city"
+                    value={newAddress.city}
+                    onChange={handleNewAddressChange}
+                    placeholder="City"
+                    className="w-full border rounded-md px-3 py-2"
+                  />
+
+                  <input
+                    name="state"
+                    value={newAddress.state}
+                    onChange={handleNewAddressChange}
+                    placeholder="State"
+                    className="w-full border rounded-md px-3 py-2"
+                  />
+
+                  <button
+                    type="button"
+                    disabled={savingAddress}
+                    onClick={saveNewAddress}
+                    className="w-full py-2 rounded-md text-white bg-black disabled:opacity-60"
+                  >
+                    {savingAddress ? "Saving..." : "Save Address"}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAddressTab("SAVED");
+                      resetNewAddress();
+                    }}
+                    className="w-full py-2 rounded-md border"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : loadingAddresses ? (
+                <p className="text-sm text-gray-500">Loading addresses...</p>
+              ) : savedAddresses.length === 0 ? (
+                <p className="text-sm text-gray-500">
+                  No saved addresses. Click <b>Add New</b> to add one.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {savedAddresses.map((addr) => {
+                    const fullAddress = [addr.line1, addr.line2, addr.line3]
+                      .filter(Boolean)
+                      .join(", ");
+
+                    return (
+                      <div
+                        key={addr.id}
+                        className="border rounded-md p-3 hover:bg-gray-50"
+                      >
+                        <p className="font-medium">{addr.type || "HOME"}</p>
+
+                        <p className="text-sm text-gray-600 mt-1">
+                          {fullAddress}
+                        </p>
+
+                        {(addr.city || addr.state) && (
+                          <p className="text-sm text-gray-600">
+                            {[addr.city, addr.state].filter(Boolean).join(", ")}
+                          </p>
+                        )}
+
+                        {addr.phoneNumber && (
+                          <p className="text-sm text-gray-600">
+                            {addr.phoneNumber}
+                          </p>
+                        )}
+
+                        <p className="text-sm text-gray-500">
+                          PIN: {addr.pinCode}
+                        </p>
+
+                        <button
+                          onClick={() => applyAddress(addr)}
+                          className="mt-2 px-3 py-1 bg-black text-white rounded text-sm"
+                        >
+                          Deliver Here
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {showPaymentModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-5">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-semibold">Choose Payment Method</h3>
-              <button
-                onClick={() => setShowPaymentModal(false)}
-                className="text-gray-600 hover:text-black text-xl"
-              >
-                ✕
-              </button>
+        <div className="fixed inset-0 z-50 bg-black/50">
+          <div className="min-h-screen w-full flex items-center justify-center p-4">
+            <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-5 max-h-[80vh] overflow-auto">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-semibold">Choose Payment Method</h3>
+                <button
+                  onClick={() => setShowPaymentModal(false)}
+                  className="text-gray-600 hover:text-black text-xl"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <label className="flex items-center gap-3 border rounded-md p-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="ONLINE"
+                    checked={selectedMethod === "ONLINE"}
+                    onChange={(e) => setSelectedMethod(e.target.value)}
+                  />
+                  <div>
+                    <p className="font-medium">Online Payment</p>
+                    <p className="text-xs text-gray-500">
+                      UPI / Card / Netbanking
+                    </p>
+                  </div>
+                </label>
+
+                <label className="flex items-center gap-3 border rounded-md p-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="COD"
+                    checked={selectedMethod === "COD"}
+                    onChange={(e) => setSelectedMethod(e.target.value)}
+                  />
+                  <div>
+                    <p className="font-medium">Cash on Delivery</p>
+                    <p className="text-xs text-gray-500">
+                      Pay when product is delivered
+                    </p>
+                  </div>
+                </label>
+              </div>
+
+              <div className="mt-4 flex gap-3">
+                <button
+                  onClick={() => setShowPaymentModal(false)}
+                  className="w-1/2 border py-2 rounded-md"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  disabled={!selectedMethod}
+                  onClick={() => {
+                    if (selectedMethod === "COD") confirmCOD();
+                    if (selectedMethod === "ONLINE") proceedOnlinePayment();
+                  }}
+                  className={`w-1/2 py-2 rounded-md text-white ${
+                    selectedMethod
+                      ? "bg-black"
+                      : "bg-gray-400 cursor-not-allowed"
+                  }`}
+                >
+                  Continue
+                </button>
+              </div>
+
+              <p className="text-xs text-gray-500 mt-3">
+                Total payable: <b>₹{computedTotal}</b>
+              </p>
             </div>
-
-            <div className="space-y-3">
-              <label className="flex items-center gap-3 border rounded-md p-3 cursor-pointer">
-                <input
-                  type="radio"
-                  name="payment"
-                  value="ONLINE"
-                  checked={selectedMethod === "ONLINE"}
-                  onChange={(e) => setSelectedMethod(e.target.value)}
-                />
-                <div>
-                  <p className="font-medium">Online Payment</p>
-                  <p className="text-xs text-gray-500">
-                    UPI / Card / Netbanking
-                  </p>
-                </div>
-              </label>
-
-              <label className="flex items-center gap-3 border rounded-md p-3 cursor-pointer">
-                <input
-                  type="radio"
-                  name="payment"
-                  value="COD"
-                  checked={selectedMethod === "COD"}
-                  onChange={(e) => setSelectedMethod(e.target.value)}
-                />
-                <div>
-                  <p className="font-medium">Cash on Delivery</p>
-                  <p className="text-xs text-gray-500">
-                    Pay when product is delivered
-                  </p>
-                </div>
-              </label>
-            </div>
-
-            <div className="mt-4 flex gap-3">
-              <button
-                onClick={() => setShowPaymentModal(false)}
-                className="w-1/2 border py-2 rounded-md"
-              >
-                Cancel
-              </button>
-
-              <button
-                disabled={!selectedMethod}
-                onClick={() => {
-                  if (selectedMethod === "COD") confirmCOD();
-                  if (selectedMethod === "ONLINE") proceedOnlinePayment();
-                }}
-                className={`w-1/2 py-2 rounded-md text-white ${
-                  selectedMethod ? "bg-black" : "bg-gray-400 cursor-not-allowed"
-                }`}
-              >
-                Continue
-              </button>
-            </div>
-
-            <p className="text-xs text-gray-500 mt-3">
-              Total payable: <b>₹{computedTotal}</b>
-            </p>
           </div>
         </div>
       )}
