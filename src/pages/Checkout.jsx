@@ -325,7 +325,7 @@ const Checkout = () => {
       const res = await fetch(`${PAYMENT_URL}/createCodOrder`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-<<<<<<< HEAD
+        body: JSON.stringify(payload),
         body: JSON.stringify({
           userId: user?.id,
           name: form.fullName,
@@ -336,9 +336,6 @@ const Checkout = () => {
           vendorId: items[0]?.product?.vendorId || items[0]?.vendorId,
           quantity: items[0]?.quantity || 1
         }),
-=======
-        body: JSON.stringify(payload),
->>>>>>> 6b622ba741dae657b3e40867232111f03f6f8d16
       });
 
       if (!res.ok) {
@@ -350,20 +347,15 @@ const Checkout = () => {
       const order = await res.json();
       console.log("COD order response:", order);
 
-<<<<<<< HEAD
+      window.location.href = `/order-success?orderId=${order.orderId}`;
+
 
 
       // ✅ Redirect to success page
       window.location.href = `/order-success?orderId=${order.orderId}`;
     } catch (e) {
       console.error(e);
-
-=======
-      window.location.href = `/order-success?orderId=${order.orderId}`;
-    } catch (e) {
-      console.error(e);
       alert("COD order failed ❌");
->>>>>>> 6b622ba741dae657b3e40867232111f03f6f8d16
     }
   };
 
@@ -383,7 +375,7 @@ const Checkout = () => {
       const res = await fetch(`${PAYMENT_URL}/createOrder`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-<<<<<<< HEAD
+        body: JSON.stringify(payload),
         body: JSON.stringify({
           userId: user?.id,
           name: form.fullName,
@@ -394,9 +386,6 @@ const Checkout = () => {
           vendorId: items[0]?.product?.vendorId || items[0]?.vendorId,
           quantity: items[0]?.quantity || 1
         }),
-=======
-        body: JSON.stringify(payload),
->>>>>>> 6b622ba741dae657b3e40867232111f03f6f8d16
       });
 
       if (!res.ok) {
@@ -442,10 +431,10 @@ const Checkout = () => {
             const cbData = await cbRes.json();
             console.log("Payment callback response:", cbData);
 
-<<<<<<< HEAD
+            window.location.href = `/order-success?orderId=${cbData.orderId}`;
+            console.log("Callback:", cbData);
 
-=======
->>>>>>> 6b622ba741dae657b3e40867232111f03f6f8d16
+
             window.location.href = `/order-success?orderId=${cbData.orderId}`;
           } catch (err) {
             console.error(err);
@@ -700,18 +689,16 @@ const Checkout = () => {
                 <button
                   type="button"
                   onClick={() => setAddressTab("SAVED")}
-                  className={`px-3 py-2 rounded-md text-sm border ${
-                    addressTab === "SAVED" ? "bg-black text-white" : "bg-white"
-                  }`}
+                  className={`px-3 py-2 rounded-md text-sm border ${addressTab === "SAVED" ? "bg-black text-white" : "bg-white"
+                    }`}
                 >
                   Saved
                 </button>
                 <button
                   type="button"
                   onClick={() => setAddressTab("ADD")}
-                  className={`px-3 py-2 rounded-md text-sm border ${
-                    addressTab === "ADD" ? "bg-black text-white" : "bg-white"
-                  }`}
+                  className={`px-3 py-2 rounded-md text-sm border ${addressTab === "ADD" ? "bg-black text-white" : "bg-white"
+                    }`}
                 >
                   + Add New
                 </button>
@@ -927,64 +914,14 @@ const Checkout = () => {
                     if (selectedMethod === "COD") confirmCOD();
                     if (selectedMethod === "ONLINE") proceedOnlinePayment();
                   }}
-                  className={`w-1/2 py-2 rounded-md text-white ${
-                    selectedMethod
-                      ? "bg-black"
-                      : "bg-gray-400 cursor-not-allowed"
-                  }`}
+                  className={`w-1/2 py-2 rounded-md text-white ${selectedMethod
+                    ? "bg-black"
+                    : "bg-gray-400 cursor-not-allowed"
+                    }`}
                 >
                   Continue
                 </button>
               </div>
-
-              <p className="text-xs text-gray-500 mt-3">
-                Total payable: <b>₹{computedTotal}</b>
-              </p>
-            </div>
-<<<<<<< HEAD
-
-            <div className="space-y-3">
-              <label className="flex items-center gap-3 border rounded-md p-3 cursor-pointer">
-                <input
-                  type="radio"
-                  name="payment"
-                  value="ONLINE"
-                  checked={selectedMethod === "ONLINE"}
-                  onChange={(e) => setSelectedMethod(e.target.value)}
-                />
-                <div>
-                  <p className="font-medium">Online Payment</p>
-                  <p className="text-xs text-gray-500">
-                    UPI / Card / Netbanking
-                  </p>
-                </div>
-              </label>
-
-              <label className="flex items-center gap-3 border rounded-md p-3 cursor-pointer">
-                <input
-                  type="radio"
-                  name="payment"
-                  value="COD"
-                  checked={selectedMethod === "COD"}
-                  onChange={(e) => setSelectedMethod(e.target.value)}
-                />
-                <div>
-                  <p className="font-medium">Cash on Delivery</p>
-                  <p className="text-xs text-gray-500">
-                    Pay when product is delivered
-                  </p>
-                </div>
-              </label>
-            </div>
-
-            <div className="mt-4 flex gap-3">
-              <button
-                onClick={() => setShowPaymentModal(false)}
-                className="w-1/2 border py-2 rounded-md"
-              >
-                Cancel
-              </button>
-
               <button
                 disabled={!selectedMethod}
                 onClick={() => {
@@ -1001,12 +938,12 @@ const Checkout = () => {
             <p className="text-xs text-gray-500 mt-3">
               Total payable: <b>₹{computedTotal}</b>
             </p>
-=======
->>>>>>> 6b622ba741dae657b3e40867232111f03f6f8d16
           </div>
         </div>
-      )}
-    </div>
+        </div>
+  )
+}
+    </div >
   );
 };
 
