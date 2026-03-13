@@ -908,19 +908,6 @@ const Checkout = () => {
                   Cancel
                 </button>
 
-                <button
-                  disabled={!selectedMethod}
-                  onClick={() => {
-                    if (selectedMethod === "COD") confirmCOD();
-                    if (selectedMethod === "ONLINE") proceedOnlinePayment();
-                  }}
-                  className={`w-1/2 py-2 rounded-md text-white ${selectedMethod
-                    ? "bg-black"
-                    : "bg-gray-400 cursor-not-allowed"
-                    }`}
-                >
-                  Continue
-                </button>
               </div>
               <button
                 disabled={!selectedMethod}
@@ -940,9 +927,8 @@ const Checkout = () => {
             </p>
           </div>
         </div>
-        </div>
-  )
-}
+      )
+      }
     </div >
   );
 };
