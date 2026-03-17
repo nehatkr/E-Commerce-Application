@@ -19,9 +19,6 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [page, setPage] = useState(1);
 
-  // const getProductImageUrl = (productId) => {
-  //   return `https://intern-app-ecommerce-production.up.railway.app/api/product/image/${productId}?index=0`;
-  // };
 
   useEffect(() => {
     dispatch(fetchProducts());
