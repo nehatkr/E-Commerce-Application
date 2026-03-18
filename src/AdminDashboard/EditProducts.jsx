@@ -116,6 +116,7 @@ const EditProducts = () => {
     if (!confirmDelete) return;
 
     try {
+      console.log(BASE_URL+'/api/product/'+id);
       const res = await fetch(`${BASE_URL}/api/product/${id}`, {
         method: "DELETE",
       });
