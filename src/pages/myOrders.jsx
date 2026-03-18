@@ -125,7 +125,7 @@ const MyOrders = () => {
 
               {/* PRODUCT */}
               <div className="flex items-center gap-4 border-t pt-4">
-                <img
+                {/* <img
                   src={
                     order.product?.images?.[0]
                       ?.imageUrl ||
@@ -133,7 +133,7 @@ const MyOrders = () => {
                   }
                   alt={order.product?.name}
                   className="w-20 h-20 object-cover rounded"
-                />
+                /> */}
 
                 <div className="flex-1">
                   <p className="font-semibold">
@@ -142,14 +142,10 @@ const MyOrders = () => {
                   <p className="text-sm text-gray-500">
                     Qty: {order.quantity}
                   </p>
+                  <p className="text-sm text-gray-500">
+                    Amount: ₹ {order.amount}
+                  </p>
                 </div>
-              </div>
-
-              {/* FOOTER */}
-              <div className="flex justify-end mt-6">
-                <button className="px-4 py-2 border border-black rounded hover:bg-black hover:text-white transition">
-                  View Details
-                </button>
               </div>
             </div>
           );

@@ -55,7 +55,15 @@ const ProductDetails = () => {
         const res = await axios.get(`http://localhost:8080/api/product/${id}`);
         const data = res.data;
 
-        console.log("RAW PRODUCT API RESPONSE:", data);
+        console.log("RAW PRODUCT API RESPONSE:", JSON.stringify(data, null, 2));
+        console.log("AVAILABLE TOP-LEVEL KEYS:", Object.keys(data));
+        console.log("VENDOR INFO:", {
+          vendorId: data.vendorId,
+          vendor_id: data.vendor_id,
+          vendor: data.vendor,
+          sellerId: data.sellerId,
+          seller: data.seller,
+        });
 
         const normalizedImages = buildImagesArray(data.images || []);
 
@@ -69,10 +77,12 @@ const ProductDetails = () => {
             data.vendorId ??
             data.vendor_id ??
             data.vendor?.id ??
+            data.sellerId ??
+            data.seller?.id ??
             null,
         };
 
-        console.log("NORMALIZED PRODUCT:", normalizedProduct);
+        console.log("NORMALIZED PRODUCT WITH EXTRACTED VENDOR ID:", normalizedProduct);
 
         setProduct(normalizedProduct);
         setActiveImage(normalizedProduct.imageUrl || "/placeholder.png");
@@ -160,9 +170,8 @@ const ProductDetails = () => {
                 src={imgUrl}
                 alt={product.name}
                 onClick={() => setActiveImage(imgUrl)}
-                className={`h-20 w-20 object-cover rounded cursor-pointer border ${
-                  activeImage === imgUrl ? "border-black" : "border-gray-300"
-                }`}
+                className={`h-20 w-20 object-cover rounded cursor-pointer border ${activeImage === imgUrl ? "border-black" : "border-gray-300"
+                  }`}
                 onError={(e) => {
                   e.currentTarget.onerror = null;
                   e.currentTarget.src = "/placeholder.png";

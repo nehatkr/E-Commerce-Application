@@ -174,11 +174,11 @@ const Home = () => {
 
               {isLoggedIn && role === "vendor" && (
                 <button
-                  onClick={() => navigate("/inventory")}
+                  onClick={() => navigate("/vendor/dashboard")}
                   className="px-10 py-4 rounded-full font-semibold text-sm tracking-wide
                   bg-black text-white hover:bg-gray-900 transition active:scale-95"
                 >
-                  Inventory Management
+                  Vendor Management
                 </button>
               )}
             </motion.div>
