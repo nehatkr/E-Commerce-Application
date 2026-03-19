@@ -24,7 +24,7 @@ const productSlice = createSlice({
     loading: false,
     error: null,
   },
-   reducers: {
+  reducers: {
     removeProduct: (state, action) => {
       state.items = state.items.filter(
         (product) => product.id !== action.payload
@@ -63,7 +63,7 @@ const productSlice = createSlice({
       .addCase(fetchVendorProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-       state.items = []; 
+        state.items = [];
       });
   },
 });

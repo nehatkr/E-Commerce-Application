@@ -60,10 +60,10 @@ const cartSlice = createSlice({
         description: product.shortDescription || product.description || "",
         price: Number(
           product.discountedPrice ??
-            product.discountPrice ??
-            product.originalPrice ??
-            product.price ??
-            0
+          product.discountPrice ??
+          product.originalPrice ??
+          product.price ??
+          0
         ),
         quantity: 1,
         imageUrl: getProductImage(product),

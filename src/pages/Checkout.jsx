@@ -12,7 +12,7 @@ const Checkout = () => {
   const items = useSelector((state) => state.cart.items || []);
   const user = useSelector((state) => state.auth.user);
 
-  console.log("Checkout items:", items);
+  console.log("Checkout items FULL:", JSON.stringify(items, null, 2));
 
   const makeFullUrl = (url) => {
     if (!url) return "/placeholder.png";
@@ -125,6 +125,7 @@ const Checkout = () => {
     state: "",
     phoneNumber: "",
   });
+
 
  const buildOrderPayload = () => {
   const firstItem = items[0];
@@ -660,18 +661,16 @@ const Checkout = () => {
                 <button
                   type="button"
                   onClick={() => setAddressTab("SAVED")}
-                  className={`px-3 py-2 rounded-md text-sm border ${
-                    addressTab === "SAVED" ? "bg-black text-white" : "bg-white"
-                  }`}
+                  className={`px-3 py-2 rounded-md text-sm border ${addressTab === "SAVED" ? "bg-black text-white" : "bg-white"
+                    }`}
                 >
                   Saved
                 </button>
                 <button
                   type="button"
                   onClick={() => setAddressTab("ADD")}
-                  className={`px-3 py-2 rounded-md text-sm border ${
-                    addressTab === "ADD" ? "bg-black text-white" : "bg-white"
-                  }`}
+                  className={`px-3 py-2 rounded-md text-sm border ${addressTab === "ADD" ? "bg-black text-white" : "bg-white"
+                    }`}
                 >
                   + Add New
                 </button>
@@ -887,11 +886,10 @@ const Checkout = () => {
                     if (selectedMethod === "COD") confirmCOD();
                     if (selectedMethod === "ONLINE") proceedOnlinePayment();
                   }}
-                  className={`w-1/2 py-2 rounded-md text-white ${
-                    selectedMethod
-                      ? "bg-black"
-                      : "bg-gray-400 cursor-not-allowed"
-                  }`}
+                  className={`w-1/2 py-2 rounded-md text-white ${selectedMethod
+                    ? "bg-black"
+                    : "bg-gray-400 cursor-not-allowed"
+                    }`}
                 >
                   Continue
                 </button>

@@ -54,7 +54,7 @@ const AdminSignup = () => {
       confirmPassword: formData.confirmPassword,
       role: formData.role,
     };
- 
+
 
     try {
       const res = await axios.post(
@@ -157,7 +157,7 @@ const AdminSignup = () => {
               />
             </div>
             <div className="block text-sm font-medium text-gray-700">
-              <label className="floating-label">Website url*</label>
+              <label className="floating-label">Website url</label>
               <input
                 type="url"
                 name="website"

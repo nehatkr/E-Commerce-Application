@@ -35,11 +35,11 @@ const Signup = () => {
     if (!formData.lastName) tempErrors.lastName = "Last Name is required";
     if (!emailRegex.test(formData.email)) tempErrors.email = "Invalid Email";
     //if (!passwordRegex.test(formData.password))
-      //tempErrors.password = "Invalid Password";
+    //tempErrors.password = "Invalid Password";
     if (!phoneRegex.test(formData.phoneNumber))
       tempErrors.phoneNumber = "Invalid 10-digit Phone";
     //if (!formData.password || formData.password.length < 6)
-     // tempErrors.password = "Password must be at least 6 chars";
+    // tempErrors.password = "Password must be at least 6 chars";
 
     if (!formData.password) {
       tempErrors.password = "Password is required";
@@ -47,14 +47,14 @@ const Signup = () => {
       tempErrors.password =
         "Password must be 8+ chars, 1 uppercase, 1 number, 1 special";
     }
- 
- 
+
+
     if (!formData.confirmPassword) {
       tempErrors.confirmPassword = "Confirm Password required";
     } else if (formData.password !== formData.confirmPassword) {
       tempErrors.confirmPassword = "Passwords do not match";
     }
-   
+
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
@@ -177,7 +177,7 @@ const Signup = () => {
           </div>
           <span className="text-red-500 text-xs">{errors.email}</span>
           <div className="block text-sm font-medium text-gray-700">
-            <label className="floating-label">Address L1*</label>
+            <label className="floating-label">Address Line 1 *</label>
             <input
               name="addressL1"
               placeholder="Address Line 1"
@@ -187,7 +187,7 @@ const Signup = () => {
             />
           </div>
           <div className="block text-sm font-medium text-gray-700">
-            <label className="floating-label">Address L2*</label>
+            <label className="floating-label">Address Line 2 *</label>
             <input
               name="addressL2"
               placeholder="Address Line 2"
@@ -196,7 +196,7 @@ const Signup = () => {
             />
           </div>
           <div className="block text-sm font-medium text-gray-700">
-            <label className="floating-label">Address L3*</label>
+            <label className="floating-label">Address Line 3 *</label>
             <input
               name="addressL3"
               placeholder="Address Line 3"
@@ -230,7 +230,7 @@ const Signup = () => {
           <span className="text-red-500 text-xs">{errors.phoneNumber}</span>
 
           <div className="block text-sm font-medium text-gray-700">
-            <label className="floating-label">Address L1 *</label>
+            <label className="floating-label">Password *</label>
             <input
               type="password"
               name="password"
@@ -240,15 +240,15 @@ const Signup = () => {
               required
             />
           </div>
-            <div className="block text-sm font-medium text-gray-700">
-            <label className="floating-label">Address L1 *</label>
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="Confirm Password *"
-            onChange={handleChange}
-            className="input-field"
-          />
+          <div className="block text-sm font-medium text-gray-700">
+            <label className="floating-label">Confirm Password *</label>
+            <input
+              type="password"
+              name="confirmPassword"
+              placeholder="Confirm Password *"
+              onChange={handleChange}
+              className="input-field"
+            />
           </div>
           <span className="text-red-500 text-xs">
             {errors.password || errors.confirmPassword}
@@ -257,11 +257,10 @@ const Signup = () => {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3 rounded font-bold transition ${
-              loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-900 text-white hover:bg-blue-800"
-            }`}
+            className={`w-full py-3 rounded font-bold transition ${loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-900 text-white hover:bg-blue-800"
+              }`}
           >
             {loading ? "Creating Account..." : "Sign Up"}
           </button>
