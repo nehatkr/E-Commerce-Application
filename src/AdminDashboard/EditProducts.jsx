@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchVendorProducts } from "../redux/vendorProductsSlice";
-import { removeProduct } from "../redux/vendorProductsSlice";
+import { fetchVendorProducts, removeProduct } from "../redux/vendorProductsSlice";
 
 const BASE_URL = import.meta.env.VITE_PRODUCT_URL;
 
@@ -9,7 +8,7 @@ const EditProducts = () => {
   const dispatch = useDispatch();
 
   const { items: products, loading } = useSelector(
-    (state) => state.vendorProducts,
+    (state) => state.vendorProducts
   );
 
   const [editingId, setEditingId] = useState(null);
@@ -18,7 +17,6 @@ const EditProducts = () => {
   const { user } = useSelector((state) => state.auth);
   const vendorId = user?.id;
 
-  // ✅ FETCH PRODUCTS (VERY IMPORTANT)
   useEffect(() => {
     if (vendorId) {
       dispatch(fetchVendorProducts(vendorId));
@@ -30,20 +28,23 @@ const EditProducts = () => {
     setForm({
       name: product.name || "",
       category: product.category || "Men",
-      price: product.price ?? 0,
-      discountPercentage: product.discountPercentage ?? 0,
-      discountedPrice: product.discountedPrice ?? 0,
+      price: product.price ?? product.originalPrice ?? 0,
+      discountPercentage: product.discountPercentage ?? product.discount ?? 0,
+      discountedPrice: product.discountedPrice ?? product.discountPrice ?? 0,
       quantity: product.quantity ?? 0,
-      sizes: product.sizes?.join(", ") || "",
+      sizes: Array.isArray(product.sizes)
+        ? product.sizes.join(", ")
+        : product.sizes || "",
       description: product.description || "",
-      addToCartEnabled: product.quantity > 0,
     });
   };
 
   useEffect(() => {
-    if (form.price && form.discountPercentage) {
-      const discounted =
-        form.price - (form.price * form.discountPercentage) / 100;
+    const price = Number(form.price);
+    const discount = Number(form.discountPercentage);
+
+    if (!isNaN(price) && !isNaN(discount)) {
+      const discounted = price - (price * discount) / 100;
 
       setForm((prev) => ({
         ...prev,
@@ -66,7 +67,6 @@ const EditProducts = () => {
 
       const formData = new FormData();
 
-      // ✅ MUST MATCH BACKEND
       formData.append("name", form.name);
       formData.append("category", form.category);
       formData.append("quantity", Number(form.quantity));
@@ -74,33 +74,21 @@ const EditProducts = () => {
       formData.append("originalPrice", Number(form.price));
       formData.append("discountPrice", Number(form.discountedPrice));
       formData.append("description", form.description || "");
-      formData.append(
-        "addToCartEnabled",
-        form.addToCartEnabled ? "true" : "false",
-      );
 
-      // sizes → backend accepts comma separated OR repeated key
-      form.sizes
-        .split(",")
-        .map((s) => s.trim())
-        .forEach((size) => {
-          formData.append("sizes", size);
-        });
-
-      // 🔍 DEBUG (KEEP THIS)
-      for (let pair of formData.entries()) {
-        console.log(pair[0], pair[1]);
+      if (form.sizes) {
+        formData.append("sizes", form.sizes);
       }
 
       const res = await fetch(`${BASE_URL}/api/product/${id}`, {
         method: "PUT",
-        body: formData, // multipart/form-data
+        body: formData,
       });
 
-      if (!res.ok) throw new Error("Update failed");
+      if (!res.ok) {
+        throw new Error("Update failed");
+      }
 
       dispatch(fetchVendorProducts(vendorId));
-
       setEditingId(null);
     } catch (err) {
       console.error(err);
@@ -110,13 +98,12 @@ const EditProducts = () => {
 
   const deleteProduct = async (id) => {
     const confirmDelete = window.confirm(
-      "Are you sure you want to delete this product?",
+      "Are you sure you want to delete this product?"
     );
 
     if (!confirmDelete) return;
 
     try {
-      console.log(BASE_URL+'/api/product/'+id);
       const res = await fetch(`${BASE_URL}/api/product/${id}`, {
         method: "DELETE",
       });
@@ -126,8 +113,6 @@ const EditProducts = () => {
       }
 
       dispatch(removeProduct(id));
-
-      // ✅ Refresh product list after delete
       dispatch(fetchVendorProducts(vendorId));
     } catch (error) {
       console.error(error);
@@ -149,7 +134,9 @@ const EditProducts = () => {
             <tr>
               <th className="p-4">Image</th>
               <th className="p-4">ID</th>
+              <th className="p-4">Product Name</th>
               <th className="p-4">Category</th>
+              <th className="p-4">Quantity</th>
               <th className="p-4">Price</th>
               <th className="p-4">Discount %</th>
               <th className="p-4">Final Price</th>
@@ -168,7 +155,6 @@ const EditProducts = () => {
 
               return (
                 <tr key={product.id} className="border-t text-center">
-                  {/* IMAGE */}
                   <td className="p-4">
                     <img
                       src={imageUrl}
@@ -181,34 +167,49 @@ const EditProducts = () => {
                     />
                   </td>
 
-                  {/* ID */}
                   <td className="p-4 font-mono text-xs">{product.id}</td>
 
-                  {/* CATEGORY */}
                   <td className="p-4 text-center">
                     {editingId === product.id ? (
-                      <select
-                        value={form.category}
+                      <input
+                        type="text"
+                        value={form.name}
                         onChange={(e) =>
-                          setForm({ ...form, category: e.target.value })
+                          setForm({ ...form, name: e.target.value })
                         }
-                        className="border px-2 py-1"
-                      >
-                        <option value="Men">Men</option>
-                        <option value="Women">Women</option>
-                        <option value="Kids">Kids</option>
-                        <option value="Accessories">Accessories</option>
-                      </select>
+                        className="border px-2 py-1 w-40"
+                      />
                     ) : (
-                      product.category
+                      product.name
                     )}
                   </td>
 
-                  {/* PRICE */}
+                  <td className="p-4 text-center">{product.category}</td>
+
                   <td className="p-4 text-center">
                     {editingId === product.id ? (
                       <input
                         type="number"
+                        min="0"
+                        value={form.quantity}
+                        onChange={(e) =>
+                          setForm({
+                            ...form,
+                            quantity: e.target.value,
+                          })
+                        }
+                        className="border px-2 py-1 w-20"
+                      />
+                    ) : (
+                      product.quantity
+                    )}
+                  </td>
+
+                  <td className="p-4 text-center">
+                    {editingId === product.id ? (
+                      <input
+                        type="number"
+                        min="0"
                         value={form.price}
                         onChange={(e) =>
                           setForm({ ...form, price: e.target.value })
@@ -216,15 +217,16 @@ const EditProducts = () => {
                         className="border px-2 py-1 w-24"
                       />
                     ) : (
-                      `₹${product.price}`
+                      `₹${product.price ?? product.originalPrice}`
                     )}
                   </td>
 
-                  {/* DISCOUNT */}
                   <td className="p-4 text-center">
                     {editingId === product.id ? (
                       <input
                         type="number"
+                        min="0"
+                        max="100"
                         value={form.discountPercentage}
                         onChange={(e) =>
                           setForm({
@@ -235,29 +237,43 @@ const EditProducts = () => {
                         className="border px-2 py-1 w-20"
                       />
                     ) : (
-                      `${product.discountPercentage}%`
+                      `${product.discountPercentage ?? product.discount}%`
                     )}
                   </td>
 
-                  {/* FINAL PRICE */}
                   <td className="p-4 font-semibold text-center">
-                    ₹{product.discountedPrice}
+                    {editingId === product.id
+                      ? `₹${form.discountedPrice}`
+                      : `₹${product.discountedPrice ?? product.discountPrice}`}
                   </td>
 
-                  {/* SIZES */}
-                  <td className="p-4 text-center">
-                    {product.sizes?.join(", ")}
-                  </td>
-
-                  {/* CART */}
-                  <td className="p-4">
-                    {product.quantity > 0 ? "✅ Available" : "❌ Out of Stock"}
-                  </td>
-
-                  {/* ACTION */}
                   <td className="p-4 text-center">
                     {editingId === product.id ? (
-                      <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={form.sizes}
+                        onChange={(e) =>
+                          setForm({ ...form, sizes: e.target.value })
+                        }
+                        placeholder="S, M, L"
+                        className="border px-2 py-1 w-28"
+                      />
+                    ) : Array.isArray(product.sizes) ? (
+                      product.sizes.join(", ")
+                    ) : (
+                      product.sizes
+                    )}
+                  </td>
+
+                  <td className="p-4">
+                    {(product.quantity ?? 0) === 0
+                      ? "❌ Out of Stock"
+                      : "✅ Available"}
+                  </td>
+
+                  <td className="p-4 text-center">
+                    {editingId === product.id ? (
+                      <div className="flex gap-2 justify-center">
                         <button
                           onClick={() => saveEdit(product.id)}
                           className="bg-green-600 text-white px-3 py-1 rounded"
@@ -272,7 +288,7 @@ const EditProducts = () => {
                         </button>
                       </div>
                     ) : (
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 justify-center">
                         <button
                           onClick={() => startEdit(product)}
                           className="bg-black text-white px-3 py-1 rounded"
