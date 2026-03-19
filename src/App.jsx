@@ -41,7 +41,7 @@ const VendorRoute = ({ children }) => {
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-50 overflow-x-hidden flex flex-col">
+      <div className="min-h-screen bg-gray-50 flex flex-col">
         <Navbar />
 
         <main className="grow">
@@ -148,7 +148,7 @@ function App() {
               path="/vendor/orderTracker"
               element={
                 <VendorRoute>
-                  <VendorOrderTracker vendorId={1} />
+                  <VendorOrderTracker />
                 </VendorRoute>
               }
             />

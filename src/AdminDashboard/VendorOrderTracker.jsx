@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 
@@ -11,9 +12,12 @@ const STATUSES = [
   "DELIVERED",
 ];
 
-const VendorDeliveryTracker = ({ vendorId }) => {
+const VendorOrderTracker = () => {
   const [deliveries, setDeliveries] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const vendor = useSelector((state) => state.auth.user);
+  const vendorId = vendor?.id;
 
   const fetchVendorDeliveries = async () => {
     try {
@@ -79,15 +83,15 @@ const VendorDeliveryTracker = ({ vendorId }) => {
                   </td>
 
                   <td className="border p-2">
-                    {delivery.deliveredQuantity ?? "-"}
+                    {delivery.deliveredQuantity ?? 0}
                   </td>
 
                   <td className="border p-2">
-                    ₹{delivery.unitPrice ?? 0}
+                    ₹{Number(delivery.unitPrice ?? 0).toLocaleString()}
                   </td>
 
                   <td className="border p-2 font-semibold">
-                    ₹{delivery.totalPrice ?? 0}
+                    ₹{Number(delivery.totalPrice ?? 0).toLocaleString()}
                   </td>
 
                   <td className="border p-2 font-semibold">
@@ -129,4 +133,4 @@ const VendorDeliveryTracker = ({ vendorId }) => {
   );
 };
 
-export default VendorDeliveryTracker;
+export default VendorOrderTracker;
