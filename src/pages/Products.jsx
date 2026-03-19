@@ -26,7 +26,9 @@ const Products = () => {
 
   const filteredProducts = useMemo(() => {
     if (selectedCategory === "all") return products;
-    return products.filter((p) => p.category === selectedCategory);
+    return products.filter(
+      (p) => p.category?.toLowerCase() === selectedCategory.toLowerCase()
+    );
   }, [products, selectedCategory]);
 
   const paginatedProducts = filteredProducts.slice(0, page * ITEMS_PER_PAGE);
@@ -38,7 +40,6 @@ const Products = () => {
       product.vendor?.id ||
       null;
 
-    // Fetch vendorId if missing
     if (!vendorId) {
       try {
         const res = await axios.get(
@@ -65,7 +66,6 @@ const Products = () => {
       }
     }
 
-    // 🟢 Prepare cart item
     const cartItem = {
       id: product.id,
       name: product.name,
@@ -81,7 +81,6 @@ const Products = () => {
     };
 
     try {
-      // 🔵 CALL BACKEND API
       await axios.post("http://localhost:8080/api/cart/add", {
         userId: user.id,
         productId: product.id,
@@ -89,9 +88,7 @@ const Products = () => {
         price: cartItem.price,
       });
 
-      // 🟣 UPDATE REDUX
       dispatch(addToCart(cartItem));
-
     } catch (error) {
       console.error("Add to cart failed:", error);
       alert("Failed to add to cart");
@@ -100,12 +97,10 @@ const Products = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 mt-16">
-      {/* LOADING */}
       {loading && (
         <p className="text-center text-gray-500">Loading products...</p>
       )}
 
-      {/* CATEGORY FILTER */}
       <div className="flex flex-wrap gap-4 mb-10">
         {["all", "men", "women", "kids", "accessories"].map((cat) => (
           <button
@@ -114,86 +109,96 @@ const Products = () => {
               setSelectedCategory(cat);
               setPage(1);
             }}
-            className={`px-5 py-2 rounded-full ${selectedCategory === cat
-              ? "bg-black text-white"
-              : "bg-gray-200"
-              }`}
+            className={`px-5 py-2 rounded-full ${
+              selectedCategory === cat
+                ? "bg-black text-white"
+                : "bg-gray-200"
+            }`}
           >
             {cat.toUpperCase()}
           </button>
         ))}
       </div>
 
-      {/* PRODUCTS GRID */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 items-stretch">
         {loading
           ? Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
-            <ProductSkeleton key={index} />
-          ))
+              <ProductSkeleton key={index} />
+            ))
           : paginatedProducts.map((product) => (
-            <div
-              key={product.id}
-              className="bg-white rounded-xl shadow hover:shadow-xl cursor-pointer"
-              onClick={() => navigate(`/products/${product.id}`)}
-            >
-              <img
-                src={product.images?.[0]?.imageUrl}
-                alt={product.name}
-                onError={(e) => {
-                  e.target.src = "/fallback.png";
-                }}
-                loading="lazy"
-              />
-
-              <div className="p-4">
-                <h3 className="text-lg font-semibold">
-                  {product.name}
-                </h3>
-
-                <p className="text-sm text-gray-500 mt-1">
-                  {product.shortDescription}
-                </p>
-
-                <div className="flex gap-2 mt-3 flex-wrap">
-                  Sizes available:
-                  <span className="border px-2 py-1 text-xs rounded">
-                    {product.sizes.join(" ,")}
-                  </span>
-                </div>
-
-                <div className="mt-3 flex gap-2">
-                  <span className="text-xl font-bold">
-                    ₹{product.discountedPrice}
-                  </span>
-                  <span className="line-through text-gray-400">
-                    ₹{product.price}
-                  </span>
-                </div>
-
-                {isLoggedIn && (
-                  <button
-                    disabled={product.quantity === 0}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (product.quantity === 0) return;
-                      handleAddToCart(product);
+              <div
+                key={product.id}
+                className="bg-white rounded-xl shadow hover:shadow-xl cursor-pointer overflow-hidden h-full flex flex-col"
+                onClick={() => navigate(`/products/${product.id}`)}
+              >
+                <div className="w-full h-64 bg-gray-100 flex items-center justify-center overflow-hidden">
+                  <img
+                    src={product.images?.[0]?.imageUrl || "/fallback.png"}
+                    alt={product.name}
+                    onError={(e) => {
+                      e.target.src = "/fallback.png";
                     }}
-                    className={`mt-4 w-full py-2 rounded ${product.quantity > 0
-                      ? "bg-blue-900 text-white hover:bg-blue-800"
-                      : "bg-gray-300 cursor-not-allowed"
-                      }`}
-                  >
-                    {product.quantity > 0
-                      ? "Add to Cart"
-                      : "Out of Stock"}
-                  </button>
-                )}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                <div className="p-4 flex flex-col flex-grow">
+                  <h3 className="text-lg font-semibold capitalize min-h-[28px]">
+                    {product.name}
+                  </h3>
+
+                  <p className="text-sm text-gray-500 mt-1 min-h-[40px] line-clamp-2">
+                    {product.shortDescription || product.description || ""}
+                  </p>
+
+                  <div className="mt-3 min-h-[48px]">
+                    <p className="text-sm font-medium mb-1">Sizes available:</p>
+                    <div className="flex gap-2 flex-wrap">
+                      {(product.sizes || []).map((size, index) => (
+                        <span
+                          key={index}
+                          className="border px-2 py-1 text-xs rounded"
+                        >
+                          {size}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-3 flex gap-2 items-center min-h-[32px]">
+                    <span className="text-xl font-bold">
+                      ₹{product.discountedPrice ?? product.discountPrice}
+                    </span>
+                    <span className="line-through text-gray-400">
+                      ₹{product.price}
+                    </span>
+                  </div>
+
+                  <div className="mt-auto pt-4">
+                    {isLoggedIn && (
+                      <button
+                        disabled={product.quantity === 0}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (product.quantity === 0) return;
+                          handleAddToCart(product);
+                        }}
+                        className={`w-full py-2 rounded ${
+                          product.quantity > 0
+                            ? "bg-blue-900 text-white hover:bg-blue-800"
+                            : "bg-gray-300 cursor-not-allowed"
+                        }`}
+                      >
+                        {product.quantity > 0 ? "Add to Cart" : "Out of Stock"}
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
       </div>
 
-      {/* LOAD MORE */}
       {paginatedProducts.length < filteredProducts.length && (
         <div className="flex justify-center mt-10">
           <button
