@@ -10,6 +10,7 @@ const Signup = () => {
   const [apiError, setApiError] = useState("");
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
+    id: "",
     firstName: "",
     middleName: "",
     lastName: "",
@@ -34,12 +35,8 @@ const Signup = () => {
     if (!formData.firstName) tempErrors.firstName = "First Name is required";
     if (!formData.lastName) tempErrors.lastName = "Last Name is required";
     if (!emailRegex.test(formData.email)) tempErrors.email = "Invalid Email";
-    //if (!passwordRegex.test(formData.password))
-    //tempErrors.password = "Invalid Password";
     if (!phoneRegex.test(formData.phoneNumber))
       tempErrors.phoneNumber = "Invalid 10-digit Phone";
-    //if (!formData.password || formData.password.length < 6)
-    // tempErrors.password = "Password must be at least 6 chars";
 
     if (!formData.password) {
       tempErrors.password = "Password is required";
@@ -58,6 +55,8 @@ const Signup = () => {
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -81,27 +80,25 @@ const Signup = () => {
         role: "user",
       };
 
-      console.log("Signup Payload: ", payload);
-
-      await axios.post(
+      const res = await axios.post(
         "http://localhost:8080/api/users",
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        payload
       );
 
+      const createdUser = res.data;
+
+      // ✅ FIXED LOGIN
       dispatch(
         login({
-          firstName: payload.firstName,
-          email: payload.email,
-          role: "user",
+          id: createdUser.id,
+          firstName: createdUser.firstName,
+          email: createdUser.email,
+          role: createdUser.role,
         })
       );
 
       navigate("/products");
+
     } catch (error) {
       console.error(error.response?.data || error.message);
       alert("Signup failed. Please check details.");
