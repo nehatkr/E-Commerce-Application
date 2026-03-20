@@ -126,19 +126,20 @@ const Checkout = () => {
     phoneNumber: "",
   });
 
-  const buildOrderPayload = () => {
-    const firstItem = items[0];
 
-    return {
-      userId: user?.id ?? null,
-      name: form.fullName,
-      email: form.email,
-      amount: computedTotal,
-      productId: firstItem ? getProductId(firstItem) : null,
-      vendorId: firstItem ? getVendorId(firstItem) : null,
-      quantity: firstItem ? getQty(firstItem) : 1,
-    };
+ const buildOrderPayload = () => {
+  const firstItem = items[0];
+
+  return {
+    userId: user?.id ?? null,
+    name: form.fullName,
+    email: form.email,
+    amount: computedTotal,
+    productId: firstItem ? getProductId(firstItem) : null,
+    vendorId: firstItem ? getVendorId(firstItem) : null,
+    quantity: firstItem ? getQty(firstItem) : 1,
   };
+};
 
   const handleChange = (e) => {
     const { name, value } = e.target;
