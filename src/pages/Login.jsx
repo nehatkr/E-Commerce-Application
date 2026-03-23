@@ -13,47 +13,45 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-const handleLogin = async (e) => {
-  e.preventDefault();
-  setError("");
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
 
-  try {
-    const response = await axios.post(
-      "http://localhost:8080/api/auth/login",
-      { email, password, role }
-    );
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/auth/login",
+        { email, password, role }
+      );
 
-    const user = response.data;
-    console.log("Respo: ", response.data)
+      const user = response.data;
+      console.log("Respo: ", response.data);
 
-    const normalizedUser = {
-      id: user.id,
-      firstName: user.firstName,
-      email: user.email,
-      role: user?.role?.toLowerCase(),
-    };
+      const normalizedUser = {
+        id: user.id,
+        firstName: user.firstName,
+        email: user.email,
+        role: user?.role?.toLowerCase(),
+      };
 
-    dispatch(login(normalizedUser));
+      dispatch(login(normalizedUser));
 
-    if (normalizedUser.role === "vendor") {
-      navigate("/");
-    } else {
-      navigate("/products");
+      if (normalizedUser.role === "vendor") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/products");
+      }
+    } catch (err) {
+      console.error(err);
+
+      if (err.response) {
+        setError(err.response?.data?.message || "Invalid credentials");
+      } else if (err.request) {
+        setError("Server not reachable. Please try again later.");
+      } else {
+        setError("Something went wrong.");
+      }
     }
-
-  } catch (err) {
-  console.error(err);
-
-  if (err.response) {
-    setError(err.response?.data?.message || "Invalid credentials");
-  } else if (err.request) {
-    setError("Server not reachable. Please try again later.");
-  } else {
-    setError("Something went wrong.");
-  }
-}
-};
-
+  };
 
   return (
     <div className="min-h-screen bg-gray-300 flex items-center justify-center mt-10">
@@ -62,12 +60,9 @@ const handleLogin = async (e) => {
           Welcome Back
         </h2>
 
-        {error && (
-          <p className="text-red-600 text-center mb-4">{error}</p>
-        )}
+        {error && <p className="text-red-600 text-center mb-4">{error}</p>}
 
         <form onSubmit={handleLogin} className="space-y-6">
-          {/* ROLE */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Login As
@@ -82,7 +77,6 @@ const handleLogin = async (e) => {
             </select>
           </div>
 
-          {/* EMAIL */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Email
@@ -96,7 +90,6 @@ const handleLogin = async (e) => {
             />
           </div>
 
-          {/* PASSWORD */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Password

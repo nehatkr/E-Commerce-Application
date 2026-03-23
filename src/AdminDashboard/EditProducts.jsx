@@ -26,7 +26,7 @@ const EditProducts = () => {
   const startEdit = (product) => {
     setEditingId(product.id);
     setForm({
-      name: product.name || "",
+      name: product.name, // keep for backend update
       category: product.category || "Men",
       price: product.price ?? product.originalPrice ?? 0,
       discountPercentage: product.discountPercentage ?? product.discount ?? 0,
@@ -40,6 +40,8 @@ const EditProducts = () => {
   };
 
   useEffect(() => {
+    if (editingId === null) return;
+
     const price = Number(form.price);
     const discount = Number(form.discountPercentage);
 
@@ -51,7 +53,7 @@ const EditProducts = () => {
         discountedPrice: Math.round(discounted),
       }));
     }
-  }, [form.price, form.discountPercentage]);
+  }, [form.price, form.discountPercentage, editingId]);
 
   const saveEdit = async (id) => {
     try {
@@ -66,18 +68,14 @@ const EditProducts = () => {
       }
 
       const formData = new FormData();
-
-      formData.append("name", form.name);
-      formData.append("category", form.category);
+      formData.append("name", form.name); // send name to backend, but not editable in UI
+      formData.append("category", form.category || "");
       formData.append("quantity", Number(form.quantity));
       formData.append("discount", Number(form.discountPercentage));
       formData.append("originalPrice", Number(form.price));
       formData.append("discountPrice", Number(form.discountedPrice));
       formData.append("description", form.description || "");
-
-      if (form.sizes) {
-        formData.append("sizes", form.sizes);
-      }
+      formData.append("sizes", form.sizes || "");
 
       const res = await fetch(`${BASE_URL}/api/product/${id}`, {
         method: "PUT",
@@ -85,11 +83,15 @@ const EditProducts = () => {
       });
 
       if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Update failed:", errorText);
         throw new Error("Update failed");
       }
 
       dispatch(fetchVendorProducts(vendorId));
       setEditingId(null);
+      setForm({});
+      alert("Product updated successfully");
     } catch (err) {
       console.error(err);
       alert("Failed to update product");
@@ -170,18 +172,7 @@ const EditProducts = () => {
                   <td className="p-4 font-mono text-xs">{product.id}</td>
 
                   <td className="p-4 text-center">
-                    {editingId === product.id ? (
-                      <input
-                        type="text"
-                        value={form.name}
-                        onChange={(e) =>
-                          setForm({ ...form, name: e.target.value })
-                        }
-                        className="border px-2 py-1 w-40"
-                      />
-                    ) : (
-                      product.name
-                    )}
+                    {product.name}
                   </td>
 
                   <td className="p-4 text-center">{product.category}</td>
@@ -281,7 +272,10 @@ const EditProducts = () => {
                           Save
                         </button>
                         <button
-                          onClick={() => setEditingId(null)}
+                          onClick={() => {
+                            setEditingId(null);
+                            setForm({});
+                          }}
                           className="bg-gray-400 text-white px-3 py-1 rounded"
                         >
                           Cancel

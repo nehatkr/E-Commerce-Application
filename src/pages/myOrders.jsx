@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Package, Truck, CheckCircle } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 
@@ -13,14 +13,11 @@ const STATUS_STEPS = [
   "DELIVERED",
 ];
 
-const getStatusIcon = (status, isActive) => {
-  if (status === "DELIVERED")
-    return <CheckCircle size={16} />;
-  if (
-    status === "IN_TRANSIT" ||
-    status === "OUT_FOR_DELIVERY"
-  )
+const getStatusIcon = (status) => {
+  if (status === "DELIVERED") return <CheckCircle size={16} />;
+  if (status === "IN_TRANSIT" || status === "OUT_FOR_DELIVERY") {
     return <Truck size={16} />;
+  }
   return <Package size={16} />;
 };
 
@@ -34,7 +31,7 @@ const MyOrders = () => {
     axios
       .get(`http://localhost:8081/api/orders/user/${user.id}`)
       .then((res) => {
-        console.log(res.data);   // check here
+        console.log(res.data);
         setOrders(res.data);
       })
       .catch((err) => console.error(err));
@@ -54,38 +51,33 @@ const MyOrders = () => {
 
       <div className="space-y-6">
         {orders.map((order) => {
-          const currentIndex = STATUS_STEPS.indexOf(order.orderStatus);
+          const currentIndex =
+            STATUS_STEPS.indexOf(order.orderStatus) >= 0
+              ? STATUS_STEPS.indexOf(order.orderStatus)
+              : 0;
 
           return (
             <div
               key={order.orderId}
               className="bg-white rounded-xl shadow-md p-6"
             >
-              {/* HEADER */}
               <div className="flex justify-between mb-6">
                 <div>
-                  <p className="text-sm text-gray-500">
-                    Order ID
-                  </p>
-                  <p className="font-semibold">
-                    #{order.orderId}
-                  </p>
+                  <p className="text-sm text-gray-500">Order ID</p>
+                  <p className="font-semibold">#{order.orderId}</p>
                   <p className="text-sm text-gray-500 mt-1">
                     {new Date(order.createdAt).toLocaleDateString()}
                   </p>
                 </div>
 
                 <div className="text-right">
-                  <p className="text-sm text-gray-500">
-                    Status
-                  </p>
+                  <p className="text-sm text-gray-500">Status</p>
                   <span className="px-3 py-1 rounded-full text-xs font-semibold bg-black text-white">
-                    {order.orderStatus.replaceAll("_", " ")}
+                    {order.orderStatus?.replaceAll("_", " ")}
                   </span>
                 </div>
               </div>
 
-              {/* TIMELINE */}
               <div className="flex items-center mb-6">
                 {STATUS_STEPS.map((step, index) => {
                   const isActive = index <= currentIndex;
@@ -97,53 +89,50 @@ const MyOrders = () => {
                     >
                       <div className="flex flex-col items-center">
                         <div
-                          className={`w-9 h-9 rounded-full flex items-center justify-center ${isActive
-                            ? "bg-black text-white"
-                            : "bg-gray-300 text-gray-600"
-                            }`}
+                          className={`w-9 h-9 rounded-full flex items-center justify-center ${
+                            isActive
+                              ? "bg-black text-white"
+                              : "bg-gray-300 text-gray-600"
+                          }`}
                         >
-                          {getStatusIcon(step, isActive)}
+                          {getStatusIcon(step)}
                         </div>
                         <p className="text-xs mt-2 text-center">
                           {step.replaceAll("_", " ")}
                         </p>
                       </div>
 
-                      {index !==
-                        STATUS_STEPS.length - 1 && (
-                          <div
-                            className={`flex-1 h-1 mx-2 ${index < currentIndex
-                              ? "bg-black"
-                              : "bg-gray-300"
-                              }`}
-                          />
-                        )}
+                      {index !== STATUS_STEPS.length - 1 && (
+                        <div
+                          className={`flex-1 h-1 mx-2 ${
+                            index < currentIndex ? "bg-black" : "bg-gray-300"
+                          }`}
+                        />
+                      )}
                     </div>
                   );
                 })}
               </div>
 
-              {/* PRODUCT */}
               <div className="flex items-center gap-4 border-t pt-4">
-                {/* <img
-                  src={
-                    order.product?.images?.[0]
-                      ?.imageUrl ||
-                    "https://via.placeholder.com/80"
-                  }
-                  alt={order.product?.name}
-                  className="w-20 h-20 object-cover rounded"
-                /> */}
-
                 <div className="flex-1">
-                  <p className="font-semibold">
-                    {order.product?.name}
-                  </p>
+                  <p className="font-semibold">{order.product?.name}</p>
+
                   <p className="text-sm text-gray-500">
                     Qty: {order.quantity}
                   </p>
+
                   <p className="text-sm text-gray-500">
                     Amount: ₹ {order.amount}
+                  </p>
+
+                  <p className="text-sm font-medium text-gray-700 mt-1">
+                    Payment:{" "}
+                    {order.paymentMode === "PAYMENT_DONE"
+                      ? "ONLINE"
+                      : order.paymentMode === "COD"
+                      ? "Cash on Delivery"
+                      : order.paymentMode}
                   </p>
                 </div>
               </div>

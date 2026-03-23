@@ -47,10 +47,12 @@ const cartSlice = createSlice({
 
       console.log("ADD TO CART payload:", product);
 
+      const qtyToAdd = Number(product.quantity) || 1;
+
       const existingItem = state.items.find((item) => item.id === product.id);
 
       if (existingItem) {
-        existingItem.quantity += 1;
+        existingItem.quantity += qtyToAdd;
         return;
       }
 
@@ -60,15 +62,15 @@ const cartSlice = createSlice({
         description: product.shortDescription || product.description || "",
         price: Number(
           product.discountedPrice ??
-          product.discountPrice ??
-          product.originalPrice ??
-          product.price ??
-          0
+            product.discountPrice ??
+            product.originalPrice ??
+            product.price ??
+            0
         ),
-        quantity: 1,
+        quantity: qtyToAdd,
         imageUrl: getProductImage(product),
         images: product.images || product.image || [],
-        vendorId: getVendorId(product), // important
+        vendorId: getVendorId(product),
       });
     },
 
