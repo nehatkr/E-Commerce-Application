@@ -216,16 +216,29 @@ const Navbar = () => {
                   </Link>
                 </li>
 
-                {role === "user" && (
-                  <li className="hover:text-gray-500">
-                    <Link to="/myOrders">
-                      <span className="flex items-center gap-2">
-                        <FiShoppingCart className="text-xl" />
-                        My Orders
-                      </span>
-                    </Link>
-                  </li>
-                )}
+               {role === "user" && (
+  <>
+    {/* ✅ Shop Now */}
+    <li className="hover:text-gray-500">
+      <Link to="/products">
+        <span className="flex items-center gap-2">
+          <FiShoppingCart className="text-xl" />
+          Shop Now
+        </span>
+      </Link>
+    </li>
+
+    {/* ✅ My Orders */}
+    <li className="hover:text-gray-500">
+      <Link to="/myOrders">
+        <span className="flex items-center gap-2">
+          <FiBox className="text-xl" />
+          My Orders
+        </span>
+      </Link>
+    </li>
+  </>
+)}
 
                 {role === "vendor" && (
                   <>
