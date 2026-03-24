@@ -126,20 +126,28 @@ const Checkout = () => {
     phoneNumber: "",
   });
 
+  const buildOrderPayload = () => {
+    const orderItems = items.map((item) => {
+      const qty = getQty(item);
+      const unitPrice = getPrice(item);
 
- const buildOrderPayload = () => {
-  const firstItem = items[0];
+      return {
+        productId: getProductId(item),
+        vendorId: getVendorId(item),
+        quantity: qty,
+        unitPrice: unitPrice,
+        totalPrice: unitPrice * qty,
+      };
+    });
 
-  return {
-    userId: user?.id ?? null,
-    name: form.fullName,
-    email: form.email,
-    amount: computedTotal,
-    productId: firstItem ? getProductId(firstItem) : null,
-    vendorId: firstItem ? getVendorId(firstItem) : null,
-    quantity: firstItem ? getQty(firstItem) : 1,
+    return {
+      userId: user?.id ?? null,
+      name: form.fullName,
+      email: form.email,
+      amount: computedTotal,
+      items: orderItems,
+    };
   };
-};
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -302,13 +310,17 @@ const Checkout = () => {
     const payload = buildOrderPayload();
     console.log("Pre-check payload:", payload);
 
-    if (!payload.productId) {
-      alert("Product ID missing in cart item");
+    if (!payload.items || payload.items.length === 0) {
+      alert("Cart is empty");
       return;
     }
 
-    if (!payload.vendorId) {
-      alert("Vendor ID missing in cart item");
+    const invalidItem = payload.items.find(
+      (item) => !item.productId || !item.vendorId
+    );
+
+    if (invalidItem) {
+      alert("Product ID or Vendor ID missing in one of the cart items");
       return;
     }
 
@@ -337,6 +349,8 @@ const Checkout = () => {
 
       const order = await res.json();
       console.log("COD order response:", order);
+
+      sessionStorage.setItem("lastOrderTotal", computedTotal);
 
       window.location.href = `/order-success?orderId=${order.orderId}`;
     } catch (e) {
@@ -375,7 +389,7 @@ const Checkout = () => {
 
       const options = {
         key: RAZORPAY_KEY,
-        amount: order.amount * 100,
+        amount: computedTotal * 100,
         currency: "INR",
         name: "NovaShop",
         description: "Order Payment",
@@ -406,6 +420,8 @@ const Checkout = () => {
 
             const cbData = await cbRes.json();
             console.log("Payment callback response:", cbData);
+
+            sessionStorage.setItem("lastOrderTotal", computedTotal);
 
             window.location.href = `/order-success?orderId=${cbData.orderId}`;
           } catch (err) {
@@ -661,16 +677,18 @@ const Checkout = () => {
                 <button
                   type="button"
                   onClick={() => setAddressTab("SAVED")}
-                  className={`px-3 py-2 rounded-md text-sm border ${addressTab === "SAVED" ? "bg-black text-white" : "bg-white"
-                    }`}
+                  className={`px-3 py-2 rounded-md text-sm border ${
+                    addressTab === "SAVED" ? "bg-black text-white" : "bg-white"
+                  }`}
                 >
                   Saved
                 </button>
                 <button
                   type="button"
                   onClick={() => setAddressTab("ADD")}
-                  className={`px-3 py-2 rounded-md text-sm border ${addressTab === "ADD" ? "bg-black text-white" : "bg-white"
-                    }`}
+                  className={`px-3 py-2 rounded-md text-sm border ${
+                    addressTab === "ADD" ? "bg-black text-white" : "bg-white"
+                  }`}
                 >
                   + Add New
                 </button>
@@ -886,10 +904,11 @@ const Checkout = () => {
                     if (selectedMethod === "COD") confirmCOD();
                     if (selectedMethod === "ONLINE") proceedOnlinePayment();
                   }}
-                  className={`w-1/2 py-2 rounded-md text-white ${selectedMethod
-                    ? "bg-black"
-                    : "bg-gray-400 cursor-not-allowed"
-                    }`}
+                  className={`w-1/2 py-2 rounded-md text-white ${
+                    selectedMethod
+                      ? "bg-black"
+                      : "bg-gray-400 cursor-not-allowed"
+                  }`}
                 >
                   Continue
                 </button>
